@@ -4,31 +4,31 @@
 
 # Это можно применить к другим типам?
 
-We've seen that structural recursion could be generalised to catamorphisms, and that these are, in theory, capable of working with any type that can be projected into a pattern functor.
+Мы видели, что структурная рекурсия может быть обобщена на катаморфизмы, и что они теоретически способны работать с любым типом, который можно спроецировать в паттерн функтор.
 
-So far however, we've only seen `List`. We're going to take a look at another recursive data type, with two goals in mind:
-- give you some measure of confidence that catamorphisms work on more than just `List`.
-- demonstrate how to take an existing type and make it "catamorphism-ready".
+Однако пока мы видели только `List`. Мы собираемся взглянуть на другой рекурсивный тип данных, имея в виду две цели:
+- дать вам некоторую уверенность в том, что катаморфизмы работают не только для `List`
+- продемонстрировать, как взять существующий тип и сделать его "готовым к катаморфизму"
 
-## Binary tree
+## Бинарное дерево
 
-Having done the simplest recursive data type I could think of, the monomorphic list, we're going to look at the second simplest: the monomorphic binary tree.
+Сделав самый простой рекурсивный тип данных, который я мог придумать, мономорфный список, мы рассмотрим второй простейший: мономорфное бинарное дерево.
 
 ![Tree](./img/tree.svg)
 
-The simplest possible tree is the empty one, which we call a `leaf`:
+Самое простое возможное дерево - это пустое дерево, которое мы называем `leaf`:
 
 ![Tree leaf](./img/tree-leaf.svg)
 
 
-A non empty tree is called a `node`, and composed of:
-- the `value` its contains.
-- a `left` branch, referencing the node's left subtree.
-- a `right` branch, referencing the node's right subtree.
+Непустое дерево называется `node`, и состоит из:
+- значения `value`
+- ветки `left`, ссылки на левое поддерево
+- ветки `right`, ссылки на правое поддерево
 
 ![Tree node](./img/tree-node.svg)
 
-We can encode this almost directly to Scala code:
+Мы можем закодировать это почти напрямую в код Scala:
 
 ```scala
 sealed trait Tree
@@ -42,7 +42,7 @@ case class Node(
 case object Leaf extends Tree
 ```
 
-Like `List`, however, creating values is a bit cumbersome - a recurring problem with recursive data types:
+Однако, как и `List`, создание значений немного обременительно - повторяющаяся проблема с рекурсивными типами данных:
 
 ```scala
 val intTree =
@@ -57,37 +57,37 @@ val intTree =
   )
 ```
 
-## Tree height
+## Высота дерева
 
-The problem we're going to solve is the height of a tree, which is defined as:
+Задача, которую мы собираемся решить, - это высота дерева, которая определяется как:
 
-> The height of a tree is the length of the longest path between its root and a non-leaf node.
+> Высота дерева - это длина самого длинного пути между его корнем и нелистовым узлом.
 
-Graphically, we see that our sample tree has a height of 3:
+Графически мы видим, что наше дерево из примера имеет высоту 3:
 
 ![Tree height](./img/tree-height.svg)
 
-Our goal is to compute this using a catamorphism. In order to do that, we'll do the exact opposite of what we did before: go from the generic definition of a catamorphism, and make everything concrete.
+Наша цель - вычислить это с помощью катаморфизма. Для этого мы сделаем прямо противоположное тому, что делали раньше: уйдем от общего определения катаморфизма и сделаем все конкретным.
 
-Our first step is to nail down the input type:
+Наш первый шаг - определить типы параметров:
 
 ![Catamorphism](./img/cata-tree-1.svg)
 
-This is straightforward: we know that the input type of a function that computes a tree's height must be of type `Tree`.
+Это просто: мы знаем, что тип параметра функции, которая вычисляет высоту дерева, должен быть `Tree`.
 
 ![Tree Catamorphism](./img/cata-tree-2.svg)
 
-## Pattern functor
+## Паттерн функтор
 
-Once we have the input type, we need its pattern functor:
+Когда у нас есть тип входных параметров, пора применить к нему паттерн функтор:
 
 ![Tree pattern functor](./img/cata-tree-4.svg)
 
-We could use the same trick we did, almost by mistake, for `List`, and use an optional left branch, right branch and value, but I would rather avoid that. Tuples quickly confuse me, parenthesis everywhere, confusing field names...
+Мы могли бы использовать тот же трюк, который мы сделали, почти случайно, для `List`, и использовать необязательную левую ветвь, правую ветвь и значение, но я бы предпочел этого избежать. Кортежи меня быстро сбивают с толку, везде скобки, запутанные имена полей ...
 
-Instead, we'll use a very mechanical approach, one that you can apply to any recursive data type you encounter.
+Вместо этого мы будем использовать очень механический подход, который можно применить к любому рекурсивному типу данных, с которым вы столкнетесь.
 
-The first step is to take your type and its branches, and append `F` to their names:
+Первый шаг - взять ваш тип и его ветви и добавить к их именам букву F:
 
 ```scala
 sealed trait TreeF
@@ -101,7 +101,7 @@ case class NodeF(
 case object LeafF extends TreeF
 ```
 
-The second step is to add a type parameter. Remember that the pattern functor's type parameter is used to represent the recursive part of your data type, which is how we can map it to the type of the problem before and after it's been solved. This means that we must replace any occurrence of `Tree` in `TreeF` and its subtypes with our type parameter:
+Второй шаг - добавить параметр типа. Помните, что параметр типа в паттерне функтор используется для представления рекурсивной части вашего типа данных, и именно так мы можем сопоставить его с типом задачи до и после ее решения. Это означает, что мы должны заменить любое `Tree` в `TreeF` и его подтипах нашим параметром типа:
 
 ```scala
 sealed trait TreeF[+A]
@@ -115,22 +115,22 @@ case class NodeF[A](
 case object LeafF extends TreeF[Nothing]
 ```
 
-Don't worry if you don't understand the `+A` and `Nothing` bits - it's perfectly safe to consider them as a syntactic trick to be able to declare `LeafF` as an object.
+Не волнуйтесь, если вы не понимаете `+A` и `Nothing` - их совершенно безопасно рассматривать как синтаксический трюк, позволяющий объявить `LeafF` как объект.
 
-And that's our pattern functor! In the case of the height of a tree, for example, we know that we'll be manipulating two `TreeF` types:
-- `TreeF[Tree]`, representing the explicit split of larger problems into smaller ones.
-- `TreeF[A]`, representing larger problems and the solution to the smaller ones that compose them.
+И это наш паттерн функтор! В случае, например, высоты дерева, мы знаем, что будем манипулировать двумя типами TreeF:
+- `TreeF[Tree]`, представляет собой явное разделение больших задач на более мелкие
+- `TreeF[A]`, представление более крупных задач и решение более мелких, составляющих их
 
 
 ![TreeF](./img/cata-tree-7.svg)
 
-## Projection
+## Проекция
 
-Having our input type, `Tree`, and its pattern functor, `TreeF`, we need to be able to project the former into the later:
+Имея наш входной тип `Tree` и его паттерн функтор `TreeF`, мы должны иметь возможность проецировать один на другой:
 
 ![Projection](./img/cata-tree-11.svg)
 
-This is a straightforward mapping of `Node` to `NodeF` and `Leaf` to `LeafF`:
+Это прямое отображение `Node` в `NodeF` и `Leaf` в `LeafF`:
 
 ```scala
 def projectTree: Tree => TreeF[Tree] = {
@@ -139,17 +139,17 @@ def projectTree: Tree => TreeF[Tree] = {
 }
 ```
 
-Which gives us the following updated diagram:
+Это дает нам следующую обновленную диаграмму:
 
 ![Tree projection](./img/cata-tree-12.svg)
 
-## Functor instance
+## Экземпляр функтора
 
-Of course, `TreeF`, being a pattern functor, needs to have a functor instance - otherwise we can't call `map`.
+Конечно, `TreeF`, будучи паттерном функтор, должен иметь экземпляр функтор - в противном случае мы не можем вызвать `map`.
 
 ![Tree projection](./img/cata-tree-14.svg)
 
-We can provide this instance by applying the exact same logic we used for `ListF`: apply the mapped-over function to each recursive parts of a tree.
+Мы можем предоставить этот экземпляр, применив ту же логику, которую мы использовали для `ListF`: применить функцию преобразования к каждой рекурсивной части дерева.
 
 ```scala
 implicit val treeFFunctor = new Functor[TreeF] {
@@ -161,18 +161,18 @@ implicit val treeFFunctor = new Functor[TreeF] {
 }
 ```
 
-This is such a mechanical implementation that it's most likely possible to derive it automatically (I've successfully done it for `TreeF` using [kittens](https://github.com/typelevel/kittens) but cannot guarantee that it's always possible - just that I haven't encountered a case where it wasn't).
+Это настолько механическая реализация, что, скорее всего, ее можно получить автоматически.(Я успешно сделал это для `TreeF` используя [kittens](https://github.com/typelevel/kittens) но не могу гарантировать, что это всегда возможно - просто я не встречал случая, когда это не возможно).
 
 
-## F-Algebra
+## F-Алгебра
 
-Finally, we get to the one piece that's of any actual interest: the F-Algebra. The part where we actually compute the height of our tree.
+Наконец, мы подошли к одной части, которая действительно интересна: F-алгебре. Часть, в которой мы фактически вычисляем высоту нашего дерева.
 
 ![Tree projection](./img/cata-tree-15.svg)
 
-The base case is obvious: the height of an empty tree is 0.
+Базовый случай очевиден: высота пустого дерева равна 0.
 
-The step case is also relatively intuitive: we're given the height of the left and right subtrees. The largest of these values is the longest path from a direct descendant of the current node to a non-leaf node, and adding one to this yields the height of the tree.
+Шаг также относительно интуитивно понятен: нам дается высота левого и правого поддеревьев. Наибольшее из этих значений - это самый длинный путь от прямого потомка текущего узла до нелистового узла, и добавление к нему единицы дает высоту дерева.
 
 
 ```scala
@@ -182,21 +182,21 @@ val heightAlgebra: TreeF[Int] => Int = {
 }
 ```
 
-This gives us the last missing piece of our problem:
+Это дает нам последнюю недостающую часть нашей проблемы:
 
 ![Height algebra](./img/cata-tree-16.svg)
 
 
-## Tree height
+## Высота дерева
 
-We can now declare the `height` combinator by putting all these things together in a catamorphism:
+Теперь мы можем объявить комбинатор `height`, объединив все эти вещи в катаморфизм:
 
 ```scala
 val height: Tree => Int =
   cata(heightAlgebra, projectTree)
 ```
 
-And this, fortunately, yields the expected result:
+И это, к счастью, дает ожидаемый результат:
 
 ```scala
 height(intTree)
@@ -205,9 +205,9 @@ height(intTree)
 
 ## Ключевые выводы
 
-It does seem that catamorphisms work for more types than just the monomorphic list. But... it certainly involves a lot of busywork, doesn't it?
+Кажется, что катаморфизмы работают не только для мономорфного списка, но и для большего количества типов. Но ... это определенно требует много работы, не так ли?
 
-Next, we'll be looking at an unfortunately popular technique for addressing this issue.
+Далее мы рассмотрим, к сожалению, популярный метод решения этой проблемы.
 
 [Назад](./cata.md) | [Оглавление](./index.md) | [Дальше](./fix.md)
 
