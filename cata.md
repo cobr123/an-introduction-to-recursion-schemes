@@ -4,11 +4,9 @@
 
 # Обобщённая свёртка
 
-We've generalised structural recursion, but for `List` only. Let's now tackle the task of generalising `fold` - generalising generalised structural recursion, as it were.
+Мы обобщили структурную рекурсию, но только для List. Давайте теперь займемся задачей обобщения `fold` - как бы обобщения обобщенной структурной рекурсии.
 
-## Generalised folds
-
-This is our current `fold` implementation:
+Это текущая реализация `fold`:
 
 ```scala
 def fold[A](
@@ -26,19 +24,19 @@ def fold[A](
 }
 ```
 
-Our task, then, is to try and remove everything that's directly linked to `List` from that code.
+Наша задача, таким образом, - попытаться удалить из этого кода все, что напрямую связано с `List`.
 
-## Abstracting over structure
+## Абстрагирование структуры
 
-Let's first look at the part that works specifically on the structure of a list:
+Давайте сначала посмотрим на ту часть, которая работает конкретно со структурой списка:
 
 ![Hard-coded structure](./img/cata-1-hl-1.svg)
 
-This takes a `List` and follows its structure to get a `Cons` or `Nil`, but an alternative way of looking at that is: we're either getting a `head` and a `tail`... or we're not. And Scala has a type meant to represent this potential absence of data: `Option`.
+Берем `List` и следуя его структуре получаем `Cons` или `Nil`, но на это можно посмотреть иначе: мы получаем `head` и `tail`... или ничего. И в Scala для этого есть специальный тип подразумевающий возможность отсутствия данных: `Option`.
 
-Using `Option` instead of `List` is not going to solve our problem - an optional `head` and `tail` is still very much a `List`. But it's at least a step in the right direction: we're moving away from `List` and towards a more generic type.
+Использование `Option` вместо `List` не решит нашу задачу - опциональный `head` и `tail` все еще очень похож на `List`. Но это шаг в правильном направлении: мы двигаемся от `List` к более обобщенному типу.
 
-Of course, in order to work with an optional `head` and `tail`, we need to be able to turn a list into one. This is commonly known as a projection, which in our case is a straightforward pattern match: `Cons` is mapped to `Some` and `Nil` to `None`.
+Конечно, чтобы работать с опциональным `head` и `tail`, мы должны превратить List в Option. Это широко известно как проекция, что в нашем случае является прямым сопоставлением с образцом: `Cons` превращается в `Some`, а `Nil` в `None`.
 
 ```scala
 val project: List => Option[(Int, List)] = {
@@ -47,7 +45,7 @@ val project: List => Option[(Int, List)] = {
 }
 ```
 
-This allows us to update `fold` to take a projection function and remove direct references to the structure of the list:
+Это позволяет нам передать в `fold` функцию проекции и удалить прямые ссылки на структуру списка:
 
 ```scala
 def fold[A](
@@ -66,27 +64,27 @@ def fold[A](
 }
 ```
 
-This does, however, make our graphical view of `fold`'s behaviour a bit more complicated:
+Однако это немного усложняет наше графическое представление поведения `fold`:
 
 ![Projection](./img/cata-2-hl-1.svg)
 
-A word of warning: things are going to get quite a bit worse before they get better. This diagram is going to keep growing for a bit, but if you bear with me, it *will* get a lot better.
+Предупреждение: все станет немного хуже, прежде чем станет лучше. Эта диаграмма будет расти еще немного, но если вы потерпите меня, она *станет* намного лучше.
 
-Eventually.
+В итоге.
 
 
-## Simplifying base and step
+## Упрощаем base и step
 
-When you introduce a new type, it's always a good idea to check whether it appears elsewhere. If it does, you might be on the right track to finding common structure which, with any luck, you'll be able to abstract over.
+Когда вы вводите новый тип, всегда полезно проверить, не появляется ли он где-нибудь еще. Если это так, возможно, вы на правильном пути к поиску общей структуры, с помощью которой, если повезет, вы сможете абстрагироваться.
 
-And, in our case, option of `head` and `tail` does appear again, albeit in a slightly less obvious way:
+И в нашем случае, опциональный `head` и `tail` действительно появляется снова, хотя и несколько менее очевидным образом:
 
 
 ![Projection](./img/cata-2-hl-2.svg)
 
-`step` takes a `head` and a `tail`, and `base` takes nothing - we could sort of merge them together to get a function that takes an optional `head` and `tail`.
+`step` принимает параметры `head` и `tail`, а `base` не принимает параметров, поэтому мы может объединить их вместе и получить функцию ожидающую на вход опциональный `head` и `tail`.
 
-Let's write this compound function. We'll name it `op` because I'm really dreadful at naming things, and to follow the common sense approach of _give it a crap name until you know what it actually does_:
+Давайте напишем эту функцию. Назовем её `op`, потому что я умею давать вещам ужасные имена, и следую правилу здравого смысла _называй плохим именем, пока не узнаешь, что оно на самом деле делает_:
 
 
 ```scala
@@ -96,9 +94,9 @@ val op: Option[(Int, String)] => String = {
 }
 ```
 
-If you remember, we're still working with `mkString`: our general `fold` is called with concrete parameters that turn it into a function that computes the textual representation of a list. Within this context:
-* `step` is the concatenation of the textual representations of `head` and `tail`, separated by `" :: "`.
-* `base` is simply `"nil"`.
+Если помните, мы все еще работаем с `mkString`: наш обобщенный `fold` вызывается с конкретными параметрами, которые превращают его в функцию получения строкового представления списка. Держа это в уме:
+* `step` это объединение текстового представления `head` и `tail`, разделенных `" :: "`.
+* `base` это просто `"nil"`.
 
 ```scala
 val op: Option[(Int, String)] => String = {
@@ -107,7 +105,7 @@ val op: Option[(Int, String)] => String = {
 }
 ```
 
-This allows us to rewrite `fold` to take `op` instead of `base` and `step`:
+Это позволяет нам переписать `fold` используя `op` вместо `base` и `step`:
 
 ```scala
 def fold[A](
@@ -125,20 +123,20 @@ def fold[A](
 }
 ```
 
-And of course, everything still behaves exactly as it did before:
+И, конечно же, все по-прежнему ведет себя точно так же, как и раньше:
 
 ```scala
 fold(op, project)(ints)
 // res12: String = 3 :: 2 :: 1 :: nil
 ```
 
-But the resulting diagram is slightly disappointing:
+Но получившаяся диаграмма немного разочаровывает:
 
 ![Op, step 1](./img/cata-3-hl-1.svg)
 
-The fact that `op` appears twice is a little bit unpleasant.
+Немного неприятно, что `op` появляется дважды.
 
-We can however easily fix that by realising that `op` appears on the right hand side of all branches of the pattern match, which allows us to move it outside of the pattern match:
+Однако мы можем легко исправить это, осознав, что `op` появляется справа от всех ветвей сопоставления с образцом, что позволяет нам переместить его за пределы сопоставления:
 
 ```scala
 def fold[A](
@@ -156,17 +154,17 @@ def fold[A](
 }
 ```
 
-This yields the following diagram, which is a bit busier but makes the presence of our optional `head` and `tail` explicit:
+Это дает следующую диаграмму, которая немного загружена, но делает явным наличие наших необязательных `head` и` tail`:
 
 ![Op, step 2](./img/cata-4-hl-1.svg)
 
-## Intermediate representation
+## Промежуточное представление
 
-Let's take a little time to think about that optional `head` and `tail`. I've been saying `tail` in a bit of a hand-wavy fashion, but that's not quite correct, is it?
+Давайте немного подумаем об этих необязательных `head` и` tail`. Я говорил `tail` в немного hand-wavy fashion, но это не совсем верно, не так ли?
 
 ![Option of head, tail](./img/cata-4-hl-2.svg)
 
-On the left-hand side, we do have the tail of a list. But on the right-hand side, we have an `A`. This is not the tail of a list anymore, so what does it represent?
+С левой стороны у нас есть хвост списка. Но с правой стороны у нас есть `А`. Это больше не конец списка, так что же он представляет?
 
 It helps to think of `fold` as a mechanism for finding the solution to a problem, where the problem itself is the input `List`.
 
