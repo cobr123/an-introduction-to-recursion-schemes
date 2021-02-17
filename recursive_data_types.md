@@ -1,6 +1,6 @@
 [English version (origin)](https://nrinaudo.github.io/recschemes/recursive_data_types.html)
 
-[Назад](./introduction.md) | [Оглавление](./index.md) | [Дальше](./structural_recursion.md)
+[Назад](./introduction.md) | [Оглавление](./README.md) | [Дальше](./structural_recursion.md)
 
 # Рекурсивные типы данных
 
@@ -50,6 +50,6 @@ val ints: List =
 
 Теперь, когда мы знаем, что такое рекурсивные типы данных, наш следующий шаг - заняться с ними чем-нибудь интересным.
 
-[Назад](./introduction.md) | [Оглавление](./index.md) | [Дальше](./structural_recursion.md)
+[Назад](./introduction.md) | [Оглавление](./README.md) | [Дальше](./structural_recursion.md)
 
 This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.

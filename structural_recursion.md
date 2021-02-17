@@ -1,6 +1,6 @@
 [English version (origin)](https://nrinaudo.github.io/recschemes/structural_recursion.html)
 
-[Назад](./recursive_data_types.md) | [Оглавление](./index.md) | [Дальше](./fold.md)
+[Назад](./recursive_data_types.md) | [Оглавление](./README.md) | [Дальше](./fold.md)
 
 # Структурная рекурсия
 
@@ -71,6 +71,6 @@ def mkString(
 
 Поскольку структурная рекурсия состоит из набора четко определенных частей, наша следующая задача будет заключаться в том, чтобы абстрагироваться от общего кода и позволить себе сконцентрироваться только на интересном.
 
-[Назад](./recursive_data_types.md) | [Оглавление](./index.md) | [Дальше](./fold.md)
+[Назад](./recursive_data_types.md) | [Оглавление](./README.md) | [Дальше](./fold.md)
 
 This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.

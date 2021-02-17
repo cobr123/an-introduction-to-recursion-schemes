@@ -1,6 +1,6 @@
 [English version (origin)](https://nrinaudo.github.io/recschemes/tree_height.html)
 
-[Назад](./cata.md) | [Оглавление](./index.md) | [Дальше](./fix.md)
+[Назад](./cata.md) | [Оглавление](./README.md) | [Дальше](./fix.md)
 
 # Это можно применить к другим типам?
 
@@ -209,6 +209,6 @@ height(intTree)
 
 Далее мы рассмотрим, к сожалению, популярный метод решения этой проблемы.
 
-[Назад](./cata.md) | [Оглавление](./index.md) | [Дальше](./fix.md)
+[Назад](./cata.md) | [Оглавление](./README.md) | [Дальше](./fix.md)
 
 This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.

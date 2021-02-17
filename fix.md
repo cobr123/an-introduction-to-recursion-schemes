@@ -1,6 +1,6 @@
 [English version (origin)](https://nrinaudo.github.io/recschemes/fix.html)
 
-[Назад](./tree_height.md) | [Оглавление](./index.md) | [Дальше](./generative_recursion.md)
+[Назад](./tree_height.md) | [Оглавление](./README.md) | [Дальше](./generative_recursion.md)
 
 # Уменьшение шаблонного кода
 
@@ -384,6 +384,6 @@ Here's my (admittedly snarky) take on `Fix`. Using it makes:
 
 It's unfortunate that virtually every blog post or article explaining recursion schemes will do so through `Fix`, because on top of not being a requirement, it's not even a good idea!
 
-[Назад](./tree_height.md) | [Оглавление](./index.md) | [Дальше](./generative_recursion.md)
+[Назад](./tree_height.md) | [Оглавление](./README.md) | [Дальше](./generative_recursion.md)
 
 This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.

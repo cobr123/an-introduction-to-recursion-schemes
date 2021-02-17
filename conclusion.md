@@ -1,6 +1,6 @@
 [English version (origin)](https://nrinaudo.github.io/recschemes/conclusion.html)
 
-[Назад](./hylo.md) | [Оглавление](./index.md)
+[Назад](./hylo.md) | [Оглавление](./README.md)
 
 # Заключение
 
@@ -14,6 +14,6 @@
 
 На этом я считаю, что моя работа завершена. Я называю вас _настоящими функциональными программистами_ и желаю вам хорошего дня.
 
-[Назад](./hylo.md) | [Оглавление](./index.md)
+[Назад](./hylo.md) | [Оглавление](./README.md)
 
 This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.

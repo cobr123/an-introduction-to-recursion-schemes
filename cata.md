@@ -1,6 +1,6 @@
 [English version (origin)](https://nrinaudo.github.io/recschemes/cata.html)
 
-[Назад](./fold.md) | [Оглавление](./index.md) | [Дальше](./tree_height.md)
+[Назад](./fold.md) | [Оглавление](./README.md) | [Дальше](./tree_height.md)
 
 # Обобщённая свёртка
 
@@ -483,6 +483,6 @@ We've seen that catamorphisms are far less complicated than their names make the
 
 It's a bit of a shame that the only type we've seen that work on is `List`, then, isn't it?
 
-[Назад](./fold.md) | [Оглавление](./index.md) | [Дальше](./tree_height.md)
+[Назад](./fold.md) | [Оглавление](./README.md) | [Дальше](./tree_height.md)
 
 This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.

@@ -1,6 +1,6 @@
 [English version (origin)](https://nrinaudo.github.io/recschemes/fold.html)
 
-[Назад](./structural_recursion.md) | [Оглавление](./index.md) | [Дальше](./cata.md)
+[Назад](./structural_recursion.md) | [Оглавление](./README.md) | [Дальше](./cata.md)
 
 # Обобщённая структурная рекурсия
 
@@ -243,6 +243,6 @@ val product: List => Int =
 
 Что ж. При условии, что вы не против жестко привязать свою реализацию к структуре определенного типа. Наш `fold` работает только для списков. Мы должны попытаться что-то с этим сделать.
 
-[Назад](./structural_recursion.md) | [Оглавление](./index.md) | [Дальше](./cata.md)
+[Назад](./structural_recursion.md) | [Оглавление](./README.md) | [Дальше](./cata.md)
 
 This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.

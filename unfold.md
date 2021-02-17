@@ -1,6 +1,6 @@
 [English version (origin)](https://nrinaudo.github.io/recschemes/unfold.html)
 
-[Назад](./generative_recursion.md) | [Оглавление](./index.md) | [Дальше](./ana.md)
+[Назад](./generative_recursion.md) | [Оглавление](./README.md) | [Дальше](./ana.md)
 
 # Обобщённая генеративная рекурсия
 
@@ -238,6 +238,6 @@ We've seen that generative recursion was straightforward to generalise: turn its
 
 This allows us to have a general generative recursion function, `unfold`. General, that is, provided you're working with `List` as output...
 
-[Назад](./generative_recursion.md) | [Оглавление](./index.md) | [Дальше](./ana.md)
+[Назад](./generative_recursion.md) | [Оглавление](./README.md) | [Дальше](./ana.md)
 
 This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.

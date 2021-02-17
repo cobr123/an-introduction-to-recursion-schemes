@@ -1,6 +1,6 @@
 [English version (origin)](https://nrinaudo.github.io/recschemes/introduction.html)
 
-[Оглавление](./index.md) | [Дальше](./recursive_data_types.md)
+[Оглавление](./README.md) | [Дальше](./recursive_data_types.md)
 
 # Введение
 
@@ -24,6 +24,6 @@
 
 Да, и конечно же, вы станете настоящими функциональными программистами.
 
-[Оглавление](./index.md) | [Дальше](./recursive_data_types.md)
+[Оглавление](./README.md) | [Дальше](./recursive_data_types.md)
 
 This work is licensed under a <a rel="license" href="https://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
