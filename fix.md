@@ -311,11 +311,11 @@ heightFix(fixedIntTree)
 // res22: Int = 3
 ```
 
-## Cost of `Fix`
+## Цена `Fix`
 
-Everything seems to work out nicely, but there's a cost.
+Кажется, все идет хорошо, но за это приходится платить.
 
-Pattern matching is a very common activity, and it suddenly got less pleasant. Here's how we do it now:
+Сопоставление с образцом - очень распространенное занятие, и оно внезапно стало менее приятным. Вот как мы это делаем сейчас:
 
 ```scala
 def headOpt(list: FixedList): Option[Int] = list match {
@@ -324,7 +324,7 @@ def headOpt(list: FixedList): Option[Int] = list match {
 }
 ```
 
-Compare it to how we did it before `Fix`:
+Сравните это с тем, как мы это делали бы до использования `Fix`:
 
 ```scala
 def headOpt(list:      List): Option[Int] = list match {
@@ -333,13 +333,13 @@ def headOpt(list:      List): Option[Int] = list match {
 }
 ```
 
-It's not a drastic change, but there's certainly more boilerplate, and a requirement that you know and understand a more complex structure.
+Это не радикальное изменение, но, безусловно, больше шаблонного кода и требование, чтобы вы знали и понимали более сложную структуру.
 
-People might argue that this is unfair, that the entire point of catamorphisms is that you shouldn't have to do pattern matching anymore. I think that's only partly true, pattern matching is still a useful tool to have, but let's pretend that the argument is correct.
+Люди могут возразить, что это несправедливо, что весь смысл катаморфизмов в том, что вам больше не нужно выполнять сопоставление с образцом. Я думаю, что это верно лишь отчасти, сопоставление с образцом по-прежнему является полезным инструментом, но давайте сделаем вид, что аргумент верен.
 
-What about creating values? Surely that's something that we expect people to do quite a bit of - after all, the reason we write data types is to be able to manipulate values of these types, and these values need to be created at some point.
+А как насчет создания значений? Конечно, мы ожидаем, что люди будут делать совсем немного - в конце концов, причина, по которой мы пишем типы данных, состоит в том, чтобы иметь возможность манипулировать значениями этих типов, и эти значения должны быть созданы в какой-то момент.
 
-Here's what you have to do now:
+Вот что вам нужно сделать сейчас:
 
 ```scala
 val list: FixedList =
@@ -352,7 +352,7 @@ val list: FixedList =
   )))
 ```
 
-Here's how we did it before introducing `Fix`:
+Вот как мы это сделали бы до использования `Fix`:
 
 ```scala
 val list:      List =
@@ -365,11 +365,11 @@ val list:      List =
   )
 ```
 
-That is unarguably worse - and we already thought that the original way of creating values was too noisy!
+Это неоспоримо хуже - и мы ещё думали, что оригинальный способ создания значений был слишком многословным!
 
 ## Ключевые выводы
 
-Мы увидели, что можем использовать `Fix` для упрощения некоторых вещей - для авторов типов данных. Как автор типа данных, мне не нужно писать свой тип *и* реализовывать для него паттерн функтор, а также проекцию одного в другое. Использование `Fix` сделало мою жизнь лучше.
+Мы увидели, что можем использовать `Fix` для упрощения некоторых вещей для авторов типов данных. Как автор типа данных, мне не нужно писать свой тип *и* реализовывать для него паттерн функтор, а также проекцию одного на другое. Использование `Fix` сделало мою жизнь лучше.
 
 Хотя только один раз. Мне нужно было бы реализовать паттерн функтор и написать проекцию только один раз за все время существования моего типа данных.
 
