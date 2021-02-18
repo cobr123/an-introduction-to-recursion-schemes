@@ -15,7 +15,7 @@ And you must do all of these things before you can start writing the interesting
 The most frustrating bit is probably having to basically write the same type twice, given how close a type and its pattern functor are. The intuition that we'll follow here is that it might be possible to write one in terms of the other, since they're so similar.
 
 
-## `List` in terms of `ListF`
+## `List` с точки зрения `ListF`
 
 We've seen that `ListF` can be used to represent something that's kind of a list. `ListF[List]` can be:
 - `None`: the empty list.
@@ -114,7 +114,7 @@ The origin of that peculiar name is surprisingly straightforward, for once:
 - if `fix(f)` is the fixed-point of `f`, then `fix(f) = f(fix(f))`
 - that is exactly the definition we just wrote as Scala code.
 
-## `List` in terms of `Fix`
+## `List` с точки зрения `Fix`
 
 Now that we know how to express a recursive data type in terms of its pattern functor, let's do so properly. Here's `FixedList`:
 
@@ -137,7 +137,7 @@ val fixedInts: FixedList =
 
 It could be worse though - we could be creating a tree.
 
-## `Tree` in terms of `TreeF`
+## `Tree` с точки зрения `TreeF`
 
 Speaking of the devil, here's `FixedTree`, a tree expressed as a `Fix` and a `TreeF`:
 
@@ -279,7 +279,7 @@ Similarly, we don't need to redefine F-Algebras: they work on the pattern functo
 
 We can reuse all the F-Algebras that we have defined earlier without any additional change.
 
-## `product` in terms of `cataFix`
+## `product` с точки зрения `cataFix`
 
 `productFix`, the version of `product` that works on `FixedList`, is simpler to define than it used to be, since we can ignore the projection:
 
@@ -295,7 +295,7 @@ productFix(fixedInts)
 // res21: Int = 6
 ```
 
-## `height` in terms of `cataFix`
+## `height` с точки зрения `cataFix`
 
 Same goes for `heightFix`, the version of `height` that works on a `FixedTree`:
 
@@ -369,20 +369,20 @@ That is unarguably worse - and we already thought that the original way of creat
 
 ## Ключевые выводы
 
-We've seen that we could use `Fix` to simplify a few things - for data type authors. As a data type author, I do not have to write my type *and* its pattern functor, nor the projection of the former into the later. Using `Fix` made my life better.
+Мы увидели, что можем использовать `Fix` для упрощения некоторых вещей - для авторов типов данных. Как автор типа данных, мне не нужно писать свой тип *и* реализовывать для него паттерн функтор, а также проекцию одного в другое. Использование «Fix» сделало мою жизнь лучше.
 
-Once, though. I would only ever have to write the pattern functor and the projection once in the entire lifetime of my data type.
+Хотя только один раз. Мне нужно было бы реализовать паттерн функтор и написать проекцию только один раз за все время существования моего типа данных.
 
-On the other hand, using `Fix` makes your life, as the data type consumer, less pleasant: pattern matching and value creation have become more complex. It's made your life worse *every time you want to create a value*.
+С другой стороны, использование `Fix` делает вашу жизнь, как потребителя типа данных, менее приятной: сопоставление с образцом и создание значений стали более сложными. Это делает вашу жизнь хуже *каждый раз, когда вы хотите создать значение*.
 
-I feel this is exactly the wrong trade off to make. I should be dealing with the complexity so you don't have to, not pushing it onto you so that I can ignore it.
+Я считаю, что это совершенно неправильный компромисс. Я должен справляться со сложностью, чтобы вам не приходилось этого делать, а не навязывать ее вам, чтобы я мог ее игнорировать.
 
-Here's my (admittedly snarky) take on `Fix`. Using it makes:
-- the hard things easier (for me, the data type author).
-- the easy things harder (for you, the data type consumer).
-- little sense.
+Вот мой (правда, язвительный) взгляд на `Fix`. Его использование:
+- делает сложное проще (для меня, автора типа данных)
+- делает простые вещи сложнее (для вас, потребителя типа данных)
+- имеет мало смысла
 
-It's unfortunate that virtually every blog post or article explaining recursion schemes will do so through `Fix`, because on top of not being a requirement, it's not even a good idea!
+К сожалению, практически каждый пост в блоге или статья, объясняющая схемы рекурсии, будет делать это с помощью `Fix`. Помимо того, что это не требование, это даже не лучшая идея!
 
 [Назад](./tree_height.md) | [Оглавление](./README.md) | [Дальше](./generative_recursion.md)
 
