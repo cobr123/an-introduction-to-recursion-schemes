@@ -199,17 +199,17 @@ On the other hand, while it does remove elements from the diagram, things get a 
 
 ![cata with Fix](./img/catafix-no-b-hl-1.svg)
 
-## Projecting `Fix`
+## Проецируя `Fix`
 
-The next step is to project our input type into its pattern functor:
+Следующий шаг - спроецировать наш входной тип в его паттерн функтор:
 
 ![cata with Fix](./img/catafix-no-b-hl-2.svg)
 
-There are two ways to go about that.
+Есть два способа сделать это.
 
-The first one is the usual, magical statically typed functional programming language gimmick: _given the types we have, there's only one way we could write it_. This would give us the correct answer almost immediately, at the cost of not having a clue why it's the correct answer other than _my imaginary friend the compiler told me_. We're not going to do that, because the point of this series of article is precisely for you to understand.
+Первый - это обычный волшебный трюк на языке функционального программирования со статической типизацией: _с учетом типов, которые у нас есть, есть только один способ написать это_. Это дало бы нам правильный ответ почти сразу, за счет того, что никто не понимает, почему это правильный ответ, кроме _моего воображаемого друга, компилятора_. Но мы не собираемся этого делать, потому что цель этой серии статей - именно для того, чтобы у вас появилось понимание.
 
-The second way is a bit more roundabout, but it works just as well: we'll start from the initial implementation of `project` for `List`, and refactor it. Let's start by renaming it `projectFix`:
+Второй способ немного более обходной, но он работает точно так же хорошо: мы начнем с первоначальной реализации `project` для `List` и затем проведем его рефакторинг. Начнем с переименования его в `projectFix`:
 
 ```scala
 val projectFix: List => ListF[List] = {
@@ -259,36 +259,36 @@ def cataFix[F[_]: Functor, A](
 }
 ```
 
-Which gives us the following diagram:
+Это дает нам следующую диаграмму:
 
 ![cata with Fix projection](./img/catafix-project-hl-1.svg)
 
-## Functor instance
+## Экземпляр функтора
 
-At this point, everything becomes a lot easier. We need to be able to run `map` on our pattern functor.
+На этом этапе все становится намного проще. Нам нужно иметь возможность запускать `map` для нашего паттерна функтор.
 
 ![cata with Fix Functor](./img/catafix-project-hl-2.svg)
 
-There's no additional work required here though: our pattern functor, by definition, already has a `Functor` instance. We already defined the functor instances of `ListF` and `TreeF`, we don't have to do it again.
+Однако здесь не требуется дополнительной работы: наш паттерн функтор, по определению, уже имеет экземпляр `Functor`. Мы уже определили экземпляры функторов `ListF` и `TreeF`, нам не нужно делать это снова.
 
-## F-Algebra
+## F-Алгебра
 
-Similarly, we don't need to redefine F-Algebras: they work on the pattern functor directly, which is what we have at this stage.
+Точно так же нам не нужно переопределять F-алгебры: они работают непосредственно с паттерном функтор, который у нас есть на данном этапе.
 
 ![cata with Fix F-Algebra](./img/catafix-project-hl-3.svg)
 
-We can reuse all the F-Algebras that we have defined earlier without any additional change.
+Мы можем повторно использовать все F-алгебры, которые мы определили ранее, без каких-либо дополнительных изменений.
 
 ## `product` с точки зрения `cataFix`
 
-`productFix`, the version of `product` that works on `FixedList`, is simpler to define than it used to be, since we can ignore the projection:
+`productFix`, версию `product` которая работает с `FixedList`, определить проще, чем раньше, поскольку мы можем игнорировать проекцию:
 
 ```scala
 val productFix: FixedList => Int =
   cataFix(productAlgebra)
 ```
 
-And it still yields the expected result:
+И все равно дает ожидаемый результат:
 
 ```scala
 productFix(fixedInts)
@@ -297,14 +297,14 @@ productFix(fixedInts)
 
 ## `height` с точки зрения `cataFix`
 
-Same goes for `heightFix`, the version of `height` that works on a `FixedTree`:
+То же самое касается `heightFix`, версии `height` которая работает с `FixedTree`:
 
 ```scala
 val heightFix: FixedTree => Int =
   cataFix(heightAlgebra)
 ```
 
-Applying it to our standard tree yields the same result as before:
+Применение его к нашему стандартному дереву дает тот же результат, что и раньше:
 
 ```scala
 heightFix(fixedIntTree)
