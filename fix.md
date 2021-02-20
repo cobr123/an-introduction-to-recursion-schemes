@@ -207,7 +207,7 @@ def cataFix[F[_]: Functor, A](
 
 Есть два способа сделать это.
 
-Первый - это обычный волшебный трюк на языке функционального программирования со статической типизацией: _с учетом типов, которые у нас есть, есть только один способ написать это_. Это дало бы нам правильный ответ почти сразу, за счет того, что никто не понимает, почему это правильный ответ, кроме _моего воображаемого друга, компилятора_. Но мы не собираемся этого делать, потому что цель этой серии статей - именно для того, чтобы у вас появилось понимание.
+Первый - это обычный волшебный трюк на языке функционального программирования со статической типизацией: _с учетом типов, которые у нас есть, есть только один способ написать это_. Это дало бы нам правильный ответ почти сразу, за счет того, что никто не понимает, почему это правильный ответ, кроме _моего воображаемого друга, компилятора_. Но мы не собираемся этого делать, потому что цель этой серии статей - чтобы у вас появилось понимание.
 
 Второй способ немного более обходной, но он работает точно так же хорошо: мы начнем с первоначальной реализации `project` для `List` и затем проведем его рефакторинг. Начнем с переименования его в `projectFix`:
 
@@ -218,7 +218,7 @@ val projectFix: List => ListF[List] = {
 }
 ```
 
-We know we want to write a version specific to `FixedList`, which is really just `Fix[ListF]`:
+Мы знаем, что хотим написать версию, специфичную для `FixedList`, которая на самом деле является просто `Fix[ListF]`:
 
 ```scala
 val projectFix: Fix[ListF] => ListF[Fix[ListF]] = {
@@ -227,27 +227,27 @@ val projectFix: Fix[ListF] => ListF[Fix[ListF]] = {
 }
 ```
 
-Note how we replaced `Cons` by `Fix(Some)` and `Nil` by `Fix(None)`.
+Обратите внимание, как мы заменили `Cons` на `Fix(Some)` и `Nil` на `Fix(None)`.
 
-If you take a look at the resulting pattern match, you'll see that in both cases, we're simply taking the value that's inside of the `Fix` and returning it.
+Если вы посмотрите на полученное сопоставление с образцом, вы увидите, что в обоих случаях мы просто берем значение, которое находится внутри `Fix`, и возвращаем его.
 
-We can rewrite the entire pattern match to just unwrap the value:
+Мы можем переписать все сопоставление с образцом, чтобы просто развернуть значение:
 
 ```scala
 val projectFix: Fix[ListF] => ListF[Fix[ListF]] =
   _.value
 ```
 
-And none of this code is specific to `ListF`, which allows us to turn it into a type parameter:
+И ничего из этого не является специфическим для ListF, что позволяет нам превратить его в параметр типа:
 
 ```scala
 def projectFix[F[_]]: Fix[F] => F[Fix[F]] =
   _.value
 ```
 
-`projectFix` is simply unwrapping a layer of `Fix`.
+`projectFix` просто разворачивает слой` Fix`.
 
-This allows us to rewrite `cataFix` to not need a projection function anymore, since it'll always just be accessing the `value` field:
+Это позволяет нам переписать `cataFix`, чтобы функция проекции больше не требовалась, поскольку она всегда будет обращаться только к полю `value`:
 
 ```scala
 def cataFix[F[_]: Functor, A](
