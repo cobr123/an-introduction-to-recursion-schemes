@@ -4,34 +4,34 @@
 
 # Уменьшение шаблонного кода
 
-We've seen that making a data type "catamorphism-ready" was a lot of busywork:
-- write the data type.
-- write its pattern functor, which involves a lot of copy / pasting.
-- write its projection into that pattern functor, which involves more copy / pasting.
-- write a `Functor` instance, which involves yet more copy / pasting.
+Мы видели, что создание типа данных, "готового к катаморфизму", потребовало много усилий:
+- написать тип данных
+- реализовать паттерн функтор, который требует большого количества копирования / вставок кода
+- написать проекцию в паттерн функтор, что требует большего количества копирования / вставок кода
+- написать экземпляр `Functor`, который включает в себя еще больше копирования / вставок кода
 
-And you must do all of these things before you can start writing the interesting code, the thing that actually solves your problem, the F-Algebra.
+И вы должны сделать все это, прежде чем сможете начать писать интересный код, то, что действительно решает вашу проблему, F-алгебру.
 
-The most frustrating bit is probably having to basically write the same type twice, given how close a type and its pattern functor are. The intuition that we'll follow here is that it might be possible to write one in terms of the other, since they're so similar.
+Самым неприятным моментом, вероятно, является необходимость дважды писать один и тот же тип, учитывая, насколько близки тип и его паттерн функтор. Интуиция, которой мы здесь будем следовать, состоит в том, что можно было бы написать одно в терминах другого, поскольку они очень похожи.
 
 
 ## `List` с точки зрения `ListF`
 
-We've seen that `ListF` can be used to represent something that's kind of a list. `ListF[List]` can be:
-- `None`: the empty list.
-- `Some((head, tail))`: a cons cell.
+Мы видели, что `ListF` может быть использован для представления списка. `ListF[List]` может обозначать:
+- `None`: пустой список
+- `Some((head, tail))`: cons элемент
 
-`ListF[List]` doesn't solve our problem though - we still have to define both `ListF` and `List`, which is exactly what we want to avoid.
+`ListF[List]` не решает нашу проблему - нам все еще нужно определить и `ListF`, и `List`, чего мы как раз хотим избежать.
 
-Our goal is to write a type that's a `ListF` of _something_. Let's call that type `List2`, because it's kind of a list, but not a `List`:
+Наша цель - написать тип, представляющий собой `ListF` _чего-либо_. Назовем этот тип `List2`, потому что это что-то вроде списка, а не `List`:
 
 ```scala
 type List2 = ListF[???]
 ```
 
-And if you remember, that type parameter represents the tail of our list - think of `ListF[List]`. The tail of a list is a list: it's the smaller list to which we prepend `head` to get a complete one.
+И если вы помните, этот параметр типа представляет собой хвост нашего списка - подумайте о `ListF[List]`. Конец списка - это список: это меньший список, к которому мы добавляем `head`, чтобы получить полный.
 
-Logically, the tail of a `List2` must be of type `List2`:
+По логике, конец `List2` должен иметь тип `List2`:
 
 ```scala
 type List2 = ListF[List2]
@@ -40,20 +40,20 @@ type List2 = ListF[List2]
 // On line 2: error: illegal cyclic reference involving type List2
 ```
 
-This unfortunately won't compile, because Scala doesn't allow recursive type aliases.
+К сожалению, это не будет компилироваться, потому что Scala не поддерживает псевдонимы рекурсивных типов.
 
-But this entire series of articles has been about recursive data types, so let's try that instead. If `List2` can't *be* a `ListF[List2]`, then it can *contain* one:
+Но вся эта серия статей была посвящена рекурсивным типам данных, так что давайте их. Если `List2` не может *быть* `ListF[List2]`, тогда может быть он сможет *содержать* его:
 
 ```scala
 case class List2(value: ListF[List2])
 ```
 
-## Building a `List2`
+## Создаем `List2`
 
-`List2` always makes me a bit confused, I have troubles seeing what it represents. When that happens, I like to draw things (badly) to help me visualise them, so let's try that here.
+`List2` всегда немного сбивает меня с толку, у меня проблемы с пониманием того, что он представляет. Когда это происходит, мне нравится рисовать (плохо), чтобы визуализировать, так что давайте попробуем это и здесь.
 
 
-Here's how we'd declare our usual `3 :: 2 :: 1 :: nil` as a `List2`:
+Вот как мы объявим наши обычные `3 :: 2 :: 1 :: nil` как `List2`:
 
 ```scala
 val ints2: List2 =
@@ -66,63 +66,63 @@ val ints2: List2 =
   )))
 ```
 
-And here's a potential visualisation of it, where `List2` itself is represented as a diamond:
+А вот возможная визуализация этого, где сам `List2` представлен в виде ромба:
 
 ![List2](./img/list2.svg)
 
-You can still view our original list in there:
+Вы все еще можете увидеть наш исходный список там:
 
 ![List2 (hidden wrapper)](./img/list2-no-wrapper.svg)
 
-`List2` is really just structure that we needed to appease the compiler and have him accept a recursive type definition. The entire structure of a list is in `ListF`: an optional `head` and `tail`.
+`List2` - это просто структура, которая нам нужна, чтобы успокоить компилятор и заставить его принять определение рекурсивного типа. Вся структура списка находится в `ListF`: необязательные `head` и `tail`.
 
-## Generalising `List2`
+## Обобщаем `List2`
 
-This was an interesting observation: `List2` itself doesn't encode the structure of a list, `ListF` does. If we were to use another pattern functor - `TreeF`, say, we would get an entirely different recursive data type:
+Это было интересное наблюдение: `List2` сам по себе не кодирует структуру списка, это делает `ListF`. Если бы мы использовали другой паттерн функтор - скажем, TreeF, то получили бы совершенно другой рекурсивный тип данных:
 
 ```scala
 case class Tree2(value: TreeF[Tree2])
 ```
 
-And, yes, that is a tree: a `Tree2` contains a `TreeF`, which is one of:
-- `LeafF`: the empty tree.
-- `NodeF`: a tree node, containing a value and references to left and right `Tree2`s.
+И да, это дерево: `Tree2` содержит `TreeF`, который является одним из:
+- `LeafF`: пустое дерево
+- `NodeF`: узел дерева, содержащий значение и ссылки на левый и правый `Tree2`
 
-It doesn't get more tree-ish than that.
+Древовиднее некуда.
 
-But `Tree2` and `List2` are basically the same thing, right? Different names, certainly, and we'll fix that soon, and a different pattern functor, but what's to stop us from turning that pattern functor into a parameter?
+Но `Tree2` и` List2` - это в основном одно и то же, верно? Разумеется, другие имена, и мы скоро это исправим, и другой паттерн функтор, но что мешает нам превратить этот паттерн функтор в параметр?
 
 ```scala
 case class List2[F[_]](value: F[List2[F]])
 ```
 
-Don't let the name fool you, that type is a generic data structure used to represent any recursive data type in terms of its pattern functor. It's not necessary obvious - that `F[List2[F]]` does my head in whenever I look at it - but put in concrete types:
-- `List2[ListF]` is just recursive structure around a `ListF`: a list.
-- `List2[TreeF]` is just recursive structure around a `TreeF`: a tree.
+Не позволяйте названию вводить вас в заблуждение, этот тип является обобщенной структурой данных, используемой для представления любого рекурсивного типа данных в терминах его паттерна функтор. Это не обязательно очевидно - я не сразу понимаю что значит `F[List2[F]]`, но если вставить конкретные типы:
+- `List2[ListF]` просто рекурсивная структура вокруг `ListF`: то есть список
+- `List2[TreeF]` просто рекурсивная структура вокруг `TreeF`: то есть дерево
 
-## Naming things
+## Именование
 
-`List2` is clearly a bad name for something that is meant to represent any recursive data type. It turns out that this structure is well known and already has an official name: `Fix`, or the fixed-point combinator.
+`List2` явно плохое название для чего-то, что предназначено для представления любого рекурсивного типа данных. Оказывается, эта структура хорошо известна и уже имеет официальное название: `Fix`, или комбинатор неподвижной точки.
 
 ```scala
 case class Fix[F[_]](value: F[Fix[F]])
 ```
 
-The origin of that peculiar name is surprisingly straightforward, for once:
-- the fixed-point of function `f` is `x` such that `f(x) = x`.
-- `fix` is the function that, given a function, returns its fixed-point.
-- if `fix(f)` is the fixed-point of `f`, then `fix(f) = f(fix(f))`
-- that is exactly the definition we just wrote as Scala code.
+Происхождение этого странного имени на этот раз на удивление простое:
+- неподвижная точка функции `f` это `x` такой, что `f(x) = x`.
+- `fix` это функция, которая для данной функции возвращает ее неподвижную точку
+- если `fix(f)` неподвижная точка `f`, тогда `fix(f) = f(fix(f))`
+- это именно то определение, которое мы только что написали в виде кода на Scala 
 
 ## `List` с точки зрения `Fix`
 
-Now that we know how to express a recursive data type in terms of its pattern functor, let's do so properly. Here's `FixedList`:
+Теперь, когда мы знаем, как выразить рекурсивный тип данных в терминах его паттерна функтор, давайте сделаем это правильно. Вот `FixedList`:
 
 ```scala
 type FixedList = Fix[ListF]
 ```
 
-You can create values of that type, although it's not very pleasant:
+Вы можете создавать значения этого типа, хотя это не очень приятно:
 
 ```scala
 val fixedInts: FixedList =
@@ -135,17 +135,17 @@ val fixedInts: FixedList =
   )))
 ```
 
-It could be worse though - we could be creating a tree.
+Хотя могло быть и хуже - мы могли бы создать дерево.
 
 ## `Tree` с точки зрения `TreeF`
 
-Speaking of the devil, here's `FixedTree`, a tree expressed as a `Fix` and a `TreeF`:
+Кстати о дьяволе, вот `FixedTree`, дерево, выраженное как` Fix` и `TreeF`:
 
 ```scala
 type FixedTree = Fix[TreeF]
 ```
 
-And, yes, you can create values, if you hate yourself enough:
+И, да, вы можете создавать значения, если вы достаточно себя ненавидите:
 
 ```scala
 val fixedIntTree: FixedTree =
@@ -160,11 +160,11 @@ val fixedIntTree: FixedTree =
   ))
 ```
 
-## `cata` with `Fix`
+## `cata` вместе с `Fix`
 
-Now that we've done all that work, let's see some concrete benefits. Let's specialise our catamorphism implementation to recursive data types expressed in terms of `Fix`.
+Теперь, когда мы проделали всю эту работу, давайте посмотрим на некоторые конкретные преимущества. Давайте специализируем нашу реализацию катаморфизма на рекурсивных типах данных, выраженных в терминах `Fix`.
 
-We'll start from `cata` and rename it:
+Начнем с `cata` и переименуем его:
 
 ```scala
 def cataFix[F[_]: Functor, A, B](
@@ -177,11 +177,11 @@ def cataFix[F[_]: Functor, A, B](
 }
 ```
 
-The first thing we'll do is change the input type, since we know it's not a `B` anymore:
+Первое, что мы сделаем, это изменим тип ввода, поскольку мы знаем, что это больше не `B`:
 
 ![cata without Fix](./img/catafix-init-hl-1.svg)
 
-`cataFix` works specifically for data types expressed as `Fix[F]`, which means that `B` becomes `Fix[F]` everywhere:
+`cataFix` теперь работает для типов данных, выраженных как `Fix[F]`, что означает, что `B` везде становится `Fix[F]`:
 
 ```scala
 def cataFix[F[_]: Functor, A](
@@ -194,7 +194,7 @@ def cataFix[F[_]: Functor, A](
 }
 ```
 
-On the other hand, while it does remove elements from the diagram, things get a little bit mystical there:
+Не смотря на то, что он удаляет элементы из диаграммы, все становится немного мистическим:
 
 
 ![cata with Fix](./img/catafix-no-b-hl-1.svg)
