@@ -179,7 +179,7 @@ def recurse[A](
 
 And this is a pretty decent implementation of generative recursion, stack safety issues aside.
 
-## Naming things
+## Именование вещей
 
 Before we can move on, we must of course do the functional programmer thing and give it a proper name.
 

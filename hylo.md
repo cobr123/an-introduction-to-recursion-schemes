@@ -4,41 +4,41 @@
 
 # Обобщённая свёртка и развёртка
 
-We've seen that generalised folds (`cata`) and generalised unfolds (`ana`) seemed eerily similar.
+Мы видели, что обобщенные свёртки (`cata`) и обобщенные развёртки (`ana`) казались пугающе похожими.
 
-In this last part of the series, we'll explore that similarity.
+В этой последней части серии мы исследуем это сходство.
 
-## `cata` and `ana`
+## `cata` и `ana`
 
-If you look at `cata` and `ana` as diagrams, it's kind of hard to tell which is which:
+Если вы посмотрите на `cata` и `ana` как на диаграммы, довольно сложно сказать, что есть что:
 
 ![Recurse](./img/cata-ana.svg)
 
-We know that `cata` uses algebras and `ana` co-algebras, so the top part of the diagram is `cata` and the bottom one `ana`. But they do look very similar.
+Мы знаем что `cata` использует алгебру, а `ana` коалгебру, таким образом верхняя часть диаграммы это `cata`, а нижняя - `ana`. Но они действительно очень похожи.
 
-They are, in fact, similar in two distinct ways.
+На самом деле они похожи по двум причинам.
 
-## Duality of `cata` and `ana`
+## Двойственность `cata` и `ana`
 
-The first way is more visible if you sort of flip the diagram for `ana` around - not changing its meaning, just the layout of the nodes:
+Первая причина более заметна, если вы как бы перевернете диаграмму для `ana` - не меняя ее значения, а только расположение узлов:
 
 ![Recurse](./img/cata-ana-dual.svg)
 
-And if you look at it in that light, you can see that `ana` is just `cata`, but with the arrows "flipped": the same nodes, but arrows going in opposite directions.
+И если вы посмотрите на это в таком свете, вы увидите, что `ana` - это просто `cata`, но с "перевернутыми" стрелками: те же узлы, но стрелки, идут в противоположном направлении.
 
-This is what people mean when they say that `cata` and `ana` are duals of each other: they're the opposite of one another. Intuitively, it makes sense: you use `cata` to fold a recursive data type into a single value, while `ana` unfolds a single value into a recursive data type.
+Это то, что люди имеют в виду, когда они говорят, что `cata` и `ana` являются двойственными друг с другом: они противоположны друг другу. Интуитивно это имеет смысл: вы используете `cata` для сворачивания рекурсивного типа данных в одно значение, а `ana` разворачивает одно значение в рекурсивный тип данных.
 
-This is the first way in `cata` and `ana` are similar - they're opposite of each other.
+Это первое сходство `cata` и `ana` - они противоположны друг другу.
 
-## Composing `cata` and `ana`
+## Композирование `cata` и `ana`
 
-But if `cata` and `ana` are duals of each other, it means that one starts where the other ends, doesn't it? It means we can compose them, such as by applying a `cata` to the result of an `ana`:
+Но если `cata` и `ana` являются двойственными друг другу, это означает, что одно начинается там, где заканчивается другое, не так ли? Это означает, что мы можем композировать их, например, применив `cata` к результату `ana`:
 
 ![Recurse](./img/cata-ana-composition.svg)
 
-For example, we can compose `range` and `product`.
+Например, мы можем композировать `range` и `product`.
 
-`range` yields numbers from 1 to a given number, and `product` multiplies them together: that's `factorial` - an extremely inefficient implementation of it, but `factorial` nonetheless:
+`range` возвращает числа от 1 до заданного числа, а `product` перемножает их: это `факториал` - крайне неэффективная его реализация, но тем не менее `факториал`:
 
 ```scala
 val factorial: Int => Int =
@@ -51,7 +51,7 @@ factorial(3)
 
 
 
-Similarly, the composition of `range` an `mkString` is the string representation of a range:
+Аналогичным образом, композиция `range` и `mkString` является строковым представлением диапазона:
 
 ```scala
 val showRange: Int => String =
@@ -61,19 +61,19 @@ showRange(3)
 // res41: String = 3 :: 2 :: 1 :: nil
 ```
 
-## Simplifying `ana andThen cata`
+## Упрощение `ana andThen cata`
 
-Let's look at `showRange` in more details. Here's the corresponding diagram, with all concrete types and functions filled in:
+Давайте посмотрим на `showRange` более подробно. Вот соответствующая диаграмма, на которой указаны все конкретные типы и функции:
 
 ![Recurse](./img/show-range.svg)
 
-If you look at the leftmost part of this diagram, you can see that there seems to be some unnecessary segments: we go from a `ListF[List]` to a `List` and back to a `ListF[List]`.
+Если вы посмотрите на крайнюю левую часть этой диаграммы, вы увидите, что там есть несколько ненужных сегментов: мы переходим от `ListF[List]` к `List` и обратно к `ListF[List]`.
 
-Let's see if this intuition holds by looking at actual values. We're going to detail the steps of `showRange(3)`. According to our diagram, we'll start with `rangeCoAlgebra`:
+Давайте посмотрим, работает ли эта интуиция, посмотрев на фактические значения. Мы собираемся подробно описать шаги `showRange(3)`. Согласно нашей диаграмме, мы начнем с `rangeCoAlgebra`:
 
 ![Recurse](./img/show-range-step-by-step-2.svg)
 
-Here's the code for that function:
+Вот код этой функции:
 
 ```scala
 val rangeCoAlgebra: Int => ListF[Int] = i => {
@@ -82,18 +82,18 @@ val rangeCoAlgebra: Int => ListF[Int] = i => {
 }
 ```
 
-If you run through it, you eventually end up with nested `Some`s that represent the `3 :: 2 :: 1` list:
+Если вы выполните его, то в конечном итоге получите вложенные `Some`, которые представляют список `3 :: 2 :: 1`:
 
 
 ```scala
-Some((3, Some((2, Some((1, None))))) // rangeCoAlgebra
+Some((3, Some((2, Some((1, None)))))) // rangeCoAlgebra
 ```
 
-According to our diagram, after doing some recursion magic via `map`, we need to apply `embed`:
+Согласно нашей диаграмме, после некоторой магии рекурсии с помощью `map`, нам нужно применить `embed`:
 
 ![Recurse](./img/show-range-step-by-step-3.svg)
 
-Here's the code for `embed`, which tells us to map `Some` to `Cons`, `None` to `Nil` and leave the `head` alone:
+Вот код для `embed`, который говорит нам сопоставить `Some` с `Cons`, `None` с `Nil` и оставить `head` в покое:
 
 ```scala
 val embed: ListF[List] => List = {
@@ -102,18 +102,18 @@ val embed: ListF[List] => List = {
 }
 ```
 
-Applying that to our previous nested `Some`s yields:
+Применяя это к нашему предыдущему вложенному `Some` получаем:
 
 ```scala
-Some((3, Some((2, Some((1, None))))) // rangeCoAlgebra
-Cons( 3, Cons( 2, Cons( 1, Nil )))   // embed
+Some((3, Some((2, Some((1, None)))))) // rangeCoAlgebra
+Cons( 3, Cons( 2, Cons( 1, Nil )))    // embed
 ```
 
-Our next step is going to be `project`:
+Следующим шагом будет `project`:
 
 ![Recurse](./img/show-range-step-by-step-4.svg)
 
-This essentially undoes what `embed` did: it maps `Cons` to `Some`, `Nil` to `None` and leaves the `head` alone:
+По сути, это отменяет то, что сделал `embed`: он отображает `Cons` в `Some`, `Nil` в `None` и оставляет `head` в покое:
 
 
 ```scala
@@ -123,19 +123,19 @@ val project: List => ListF[List] = {
 }
 ```
 
-Unsurprisingly, this yields the value we had before applying `embed`.
+Неудивительно, что это дает значение, которое мы имели до применения `embed`.
 
 ```scala
-Some((3, Some((2, Some((1, None))))) // rangeCoAlgebra
-Cons( 3, Cons( 2, Cons( 1, Nil )))   // embed
-Some((3, Some((2, Some((1, None))))) // project
+Some((3, Some((2, Some((1, None))))))  // rangeCoAlgebra
+Cons( 3, Cons( 2, Cons( 1, Nil )))     // embed
+Some((3, Some((2, Some((1, None))))))  // project
 ```
 
-Finally, after running through some more recursive `map` magic, we need to apply `mkStringAlgebra`:
+Наконец, после прохождения еще одной рекурсивной магии map, нам нужно применить `mkStringAlgebra`:
 
 ![Recurse](./img/show-range-step-by-step-5.svg)
 
-This tells us to map `Some` to `step`, `None` to `base` and leave the `head` alone:
+Это говорит нам сопоставить `Some` с `step`, `None` с `base` и оставить `head` в покое:
 
 ```scala
 val mkStringAlgebra: ListF[String] => String = {
@@ -144,39 +144,39 @@ val mkStringAlgebra: ListF[String] => String = {
 }
 ```
 
-This is our final state before actually getting `showRange`'s result:
+Это наше последнее состояние перед фактическим получением результата `showRange`:
 
 ```scala
-Some((3, Some((2, Some((1, None))))) // rangeCoAlgebra
-Cons( 3, Cons( 2, Cons( 1, Nil )))   // embed
-Some((3, Some((2, Some((1, None))))) // project
-step( 3, step( 2, step( 1, base)))   // mkStringAlgebra
+Some((3, Some((2, Some((1, None)))))) // rangeCoAlgebra
+Cons( 3, Cons( 2, Cons( 1, Nil )))    // embed
+Some((3, Some((2, Some((1, None)))))) // project
+step( 3, step( 2, step( 1, base)))    // mkStringAlgebra
 ```
 
-And it really does seem that steps 2 (`embed`) and 3 (`project`) could be skipped - they're just a round trip back to the result of `rangeCoAlgebra`.
+И действительно кажется, что шаги 2 (`embed`) и 3 (`project`) можно пропустить - они просто возвращаются к результату `rangeCoAlgebra`.
 
-These are the steps we'd like to have instead:
+Вот шаги, которые мы хотели бы сделать вместо этого:
 
 ```scala
-Some((3, Some((2, Some((1, None))))) // rangeCoAlgebra
-step( 3, step( 2, step( 1, base)))   // mkStringAlgebra
+Some((3, Some((2, Some((1, None)))))) // rangeCoAlgebra
+step( 3, step( 2, step( 1, base)))    // mkStringAlgebra
 ```
 
-Which would be the following diagram:
+Которые можно изобразить следующей диаграммой:
 
 ![Recurse](./img/show-range-shortcut.svg)
 
-Let's make that diagram generic - replacing hard-coded things with parameters:
+Давайте сделаем эту диаграмму обобщенной - заменим конкретные типы на параметры:
 
 ![Recurse](./img/show-range-shortcut-step-11.svg)
 
-You'd be forgiven for assuming I made a mistake and copied the diagram for `ana` here, but they are slightly different:
+Вам простительно предположить, что я допустил ошибку и скопировал диаграмму для `ana`, но они немного отличаются:
 
 ![Recurse](./img/ana-coalgebra.svg)
 
-Do you see the difference? It's just in the name of the last arrow. Our desired function has `algebra` where `ana` has `embed`.
+Вы видите разницу? Это просто название последней стрелки. У нашей желаемой функции есть `algebra`, где у `ana` есть `embed`.
 
-It's just a parameter name though, we can refactor `ana` to take `algebra` without changing its behaviour:
+Однако это просто имя параметра, мы можем провести рефакторинг `ana`, чтобы взять `algebra`, не меняя его поведения:
 
 ```scala
 def ana[F[_]: Functor, A, B](
@@ -191,7 +191,7 @@ def ana[F[_]: Functor, A, B](
 }
 ```
 
-And this actually works out: if you write `showRange` as an anamorphism, you get the expected output:
+И это действительно работает: если вы напишете `showRange` как анаморфизм, вы получите ожидаемый результат:
 
 ```scala
 def showRange: Int => String =
@@ -201,9 +201,9 @@ showRange(3)
 // res42: String = 3 :: 2 :: 1 :: nil
 ```
 
-## Naming things
+## Именование вещей
 
-Even though this is just `ana` with an essentially meaningless difference, this has a fancy name: _hylomorphism_, or _hylo_ for short:
+Несмотря на то, что это просто `ana` с совершенно бессмысленной разницей, у этого есть причудливое название: _hylomorphism_, или для краткости _hylo_:
 
 ```scala
 def hylo[F[_]: Functor, A, B](
@@ -218,15 +218,15 @@ def hylo[F[_]: Functor, A, B](
 }
 ```
 
-It does seem weird to consider that `hylo` and `ana` are different things when their code is the same though, isn't it?
+Кажется странным считать, что `hylo` и `ana` - разные вещи, хотя их код одинаковый, не так ли?
 
-Well...
+Что ж...
 
-## A magic trick
+## Волшебный трюк
 
-For my next trick, we're going to perform some purely cosmetic refactoring of `hylo`.
+Для моего следующего трюка мы собираемся провести чисто косметический рефакторинг `hylo`.
 
-First, swap the `A`s and the `B`s - this doesn't actually change anything, they're just arbitrary names.
+Во-первых, поменяйте местами `A` и `B` - это на самом деле ничего не меняет, это просто произвольные имена.
 
 ```scala
 def hylo[F[_]: Functor, A, B](
@@ -241,7 +241,7 @@ def hylo[F[_]: Functor, A, B](
 }
 ```
 
-We'll then change the declaration order of `algebra` and `coAlgebra`:
+Затем мы изменим порядок объявления `algebra` и `coAlgebra`:
 
 ```scala
 def hylo[F[_]: Functor, A, B](
@@ -256,7 +256,7 @@ def hylo[F[_]: Functor, A, B](
 }
 ```
 
-Finally, we'll rename `coAlgebra` to `project`.
+Наконец, мы переименуем `coAlgebra` в `project`.
 
 ```scala
 def hylo[F[_]: Functor, A, B](
@@ -271,28 +271,28 @@ def hylo[F[_]: Functor, A, B](
 }
 ```
 
-And now that we've done that, I'd like you to tell me the differences between `hylo` and `cata`. [Here's](./cata#naming-things) the implementation of `cata` we'd arrived at, if you need to refresh your memory.
+И теперь, когда мы это сделали, я хотел бы, чтобы вы рассказали мне о различиях между `hylo` и `cata`. [Вот](./cata#Именование-вещей) реализация `cata`, к которой мы пришли, если вам нужно освежить память.
 
-Surprising, isn't it? `hylo` and `cata` are *also* the same thing.
+Удивительно, правда? `hylo` и `cata` - *тоже* одно и то же.
 
-This is the second way in which `cata` and `ana` are similar: they're *the same thing*.
+Это вторая причина схожести `cata` и `ana`: это *одно и то же*.
 
 ## Ключевые выводы
 
-We've seen that `cata` an `ana` were similar in two distinct way:
-* they are duals of each other - they're doing opposite things.
-* they are also the same thing.
+Мы увидели, что `cata` и `ana` похожи по двум причинам:
+* они двойственны друг другу - они делают противоположные вещи
+* в то же время они одно и то же
 
-Yes, this is a bit headache inducing. But there's a reasonable explanation! The issue, here, is that our types are not precise enough.
+Да, это немного вызывает головную боль. Но есть разумное объяснение! Проблема здесь в том, что наши типы недостаточно точны.
 
-We've defined `cata` as structural recursion for types that can be projected into a pattern functor. And it's true that a projection is a kind of co-algebra - they both have the same type, after all: `A => F[A]`. But not all co-algebras are projections: `rangeCoAlgebra`, for example, doesn't project a recursive data type into its pattern functor.
+Мы определили `cata` как структурную рекурсию для типов, которые могут быть спроецированы в паттерн функтор. И это правда, что проекция - это своего рода коалгебра - в конце концов, они обе имеют один и тот же тип: `A => F[A]`. Но не все коалгебры являются проекциями: например, `rangeCoAlgebra` не проецирует рекурсивный тип данных в свой паттерн функтор.
 
-Similarly, embeddings are algebras, but not all algebras are embeddings.
+Точно так же вложения(`embed`) являются алгебрами, но не все алгебры являются вложениями(`embed`).
 
-This is the crucial distinction between `ana`, `cata` and `hylo`:
-* `cata` is a specialised kind of `hylo` used to collapse a recursive data type onto itself.
-* `ana` is a specialised kind of `hylo` used to blow a value into a recursive data type.
-* `hylo` is both of these things, generalised arguably further than is strictly sane.
+Вот ключевое различие между `ana`, `cata` и `hylo`:
+* `cata` - это специализированный вид `hylo`, используемый для свертывания рекурсивного типа данных на себя
+* `ana` - это специализированный вид `hylo`, используемый для преобразования значения в рекурсивный тип данных
+* `hylo` - это обе эти вещи, возможно, обобщенные дальше, чем это строго разумно
 
 [Назад](./ana.md) | [Оглавление](./README.md) | [Дальше](./conclusion.md)
 

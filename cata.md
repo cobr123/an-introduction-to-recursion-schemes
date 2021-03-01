@@ -414,7 +414,7 @@ Which gives us a `List`-free implementation:
 
 ![Generalised List](./img/cata-8-hl-1.svg)
 
-## Naming things
+## Именование вещей
 
 Now that we have a fully generic implementation that we're happy with, we need to start thinking about names. The generic fold has kind of a scary name: `catamorphism`, often simplified to `cata`:
 
