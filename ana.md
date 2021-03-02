@@ -160,7 +160,7 @@ This simplifies our diagram quite nicely:
 
 ![Recurse](./img/ana-functor-hl-1.svg)
 
-## Абстрагируясь от `ListF`
+## Абстрагируемся от `ListF`
 
 We still have a few lose ends to tie up though. First, `ListF`:
 
@@ -185,7 +185,7 @@ And this gets rid of `ListF` completely.
 
 ![Recurse](./img/ana-listf-hl-1.svg)
 
-## Абстрагируясь от `List`
+## Абстрагируемся от `List`
 
 Finally, our `unfold` is still hard-coded to `List` as its output type.
 

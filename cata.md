@@ -296,11 +296,11 @@ def fold[A](
 
 ## Функтор
 
-There are many ways we could encode functor - I toyed with using subtyping here, which would work perfectly, but decided that I didn't want to finish ruining whatever reputation I might have, so let's go with the traditional, boring approach: _type classes_.
+Есть много способов, которыми мы могли бы кодировать функтор - я играл здесь с использованием подтипов, которые работали бы отлично, но решил, что не хочу заканчивать, разрушая любую репутацию, которую я мог бы иметь, поэтому давайте воспользуемся традиционным скучным подходом: _классы типов_.
 
-You don't really need to know about type classes to follow, but you can learn more about them [here](../typeclasses) should you want to.
+Вам в действительности не нужно знать о классах типов, чтобы понять дальнейший материал, но вы можете узнать о них больше [здесь](https://nrinaudo.github.io/typeclasses/), если захотите. 
 
-To declare a `Functor` type class, we merely need a `Functor` trait with an abstract `map` method:
+Чтобы объявить класс типа `Functor`, нам просто нужен трейт `Functor` с абстрактным методом `map`:
 
 ```scala
 trait Functor[F[_]] {
@@ -308,7 +308,7 @@ trait Functor[F[_]] {
 }
 ```
 
-Now that the type class is defined, we need to provide an instance of that trait for our specific `ListF` type:
+Теперь, когда класс типа определен, нам нужно предоставить экземпляр этого трейта для нашего конкретного типа `ListF`:
 
 ```scala
 implicit val listFFunctor = new Functor[ListF] {
@@ -320,11 +320,11 @@ implicit val listFFunctor = new Functor[ListF] {
 }
 ```
 
-Note how the body of `map` is exactly the body of `go` in our current `fold` implementation:
-- if we have a `head` and a `tail`, apply the specified function to the `tail`.
-- otherwise, do nothing.
+Обратите внимание, что тело `map` является в точности телом `go` в нашей текущей реализации `fold`:
+- если у нас есть `head` и `tail`, применить указанную функцию к `tail`
+- в противном случае ничего не делаем
 
-Next is a little bit of syntactic glue to make the rest of the code easier to read: a `map` function that, given an `F[A]`, an `A => B` and a `Functor[F]`, puts everything together and allows us to ignore tedious implementation details.
+Далее следует немного синтаксического клея, чтобы упростить чтение остальной части кода: функция `map` принимает `F[A]`, `A => B` и `Functor[F]`, собирает всё вместе и позволяет игнорировать утомительные детали реализации.
 
 ```scala
 def map[F[_], A, B](
@@ -336,7 +336,7 @@ def map[F[_], A, B](
   functor.map(fa, f)
 ```
 
-Right, with that out of the way, we can now rewrite `fold` to use `map` instead of `go`:
+Итак, разобравшись с этим, теперь мы можем переписать `fold`, чтобы использовать `map` вместо `go`:
 
 ```scala
 def fold[A](
@@ -351,26 +351,26 @@ def fold[A](
 }
 ```
 
-Which simplifies our diagram quite a bit:
+Что немного упрощает нашу диаграмму:
 
 ![Functor included](./img/cata-6-hl-1.svg)
 
-Now, people that are already familiar with functors are probably also aware that the polymorphic list, `List[A]`, has a functor instance: given a `List[A]` and an `A => B`, you can get a `List[B]`.
+Люди, которые уже знакомы с функторами, вероятно, также знают, что полиморфный список `List[A]` имеет экземпляр функтора: для `List[A]` и `A => B` вы можете получить `List[B]`.
 
-It's important to realise that the functor instances for `List` and `ListF` are not the same thing. This is often a source of confusion, but it makes sense when you think about it: they do not work on the same things at all. The `A` of `List[A]` and in `ListF[A]` are completely different things.
+Важно понимать, что экземпляры функтора для `List` и `ListF` это не одно и то же. Это часто является источником путаницы, но, если задуматься, это имеет смысл: они работают над совсем разными вещами. `A` в `List[A]` и в `ListF[A]` - это совершенно разные вещи.
 
-In `List[A]`, `A` is the type of the values contained by the list. `List[Int]`, for example, represents a list of integers.
+В `List[A]`, `A` это тип значений, содержащихся в списке. `List[Int]`, например, представляет собой список целых чисел.
 
-In `ListF[A]`, `A` is the type of the value we use to represent the tail of a list. `ListF[List]` is a direct representation of a `List`: a head and a tail. `ListF[Int]` is the representation of a list after we've turned its tail into an int, for example by computing its product.
+В `ListF[A]`, `A` это тип значения, которое мы используем для представления хвоста списка. `ListF[List]` является прямым представлением `List`: голова и хвост. `ListF[Int]` это представление списка после того, как мы превратили его хвост в int, например, вычислив его произведение.
 
 
-## Абстрагируясь от `ListF`
+## Абстрагируемся от `ListF`
 
-We're not quite done yet: `fold` still relies on `ListF`, which is strongly tied to the structure of a list.
+Мы еще не совсем закончили: `fold` все еще полагается на `ListF`, который сильно привязан к структуре списка.
 
 ![ListF](./img/cata-6-hl-2.svg)
 
-If we look at the code though, the only thing we actually need to know about `ListF` is that we can call `map` on it - that it has a `Functor` instance. This allows us to rewrite `fold` in a way that works for any type constructor `F` that has a `Functor` instance:
+Однако если мы посмотрим на код, единственное, что нам действительно нужно знать о `ListF`, - это то, что мы можем вызвать для него `map`, тоесть у него есть экземпляр `Functor`. Это позволяет нам переписать `fold` так, чтобы он работал для любого конструктора типа `F`, который имеет экземпляр `Functor`:
 
 ```scala
 def fold[F[_]: Functor, A](
@@ -385,17 +385,17 @@ def fold[F[_]: Functor, A](
 }
 ```
 
-This gives us `ListF`-free implementation:
+Это дает нам реализацию без `ListF`:
 
 ![Generalised ListF](./img/cata-7-hl-1.svg)
 
-## Абстрагируясь от `List`
+## Абстрагируемся от `List`
 
-Finally, the last step is abstracting over `List`, which is still the input type of our generic `fold`:
+Наконец, последний шаг - абстрагирование от `List`, который по-прежнему является входным типом нашего обобщенного` fold`:
 
 ![List](./img/cata-7-hl-2.svg)
 
-That turns out to be much simpler than we might have though: we never actually use the fact that we're working with a `List`. All we need to know about that type is that we can provide a valid `project` for it. This allows us to turn `List` into a type parameter:
+Это оказывается намного проще, чем могло бы быть: мы никогда не используем тот факт, что работаем со списком (`List`). Всё, что нам нужно знать об этом типе, - это то, что мы можем предоставить для него правильную проекцию (`project`). Это позволяет нам превратить `List` в параметр типа:
 
 ```scala
 def fold[F[_]: Functor, A, B](
@@ -410,13 +410,13 @@ def fold[F[_]: Functor, A, B](
 }
 ```
 
-Which gives us a `List`-free implementation:
+Это дает нам реализацию без `List`:
 
 ![Generalised List](./img/cata-8-hl-1.svg)
 
 ## Именование вещей
 
-Now that we have a fully generic implementation that we're happy with, we need to start thinking about names. The generic fold has kind of a scary name: `catamorphism`, often simplified to `cata`:
+Теперь, когда у нас есть полностью обобщенная реализация, которой мы довольны, нам нужно подумать об именах. Обобщенная свёртка (`fold`) имеет пугающее название: `катаморфизм`, часто упрощаемое до `ката`:
 
 ```scala
 def cata[F[_]: Functor, A, B](
@@ -431,9 +431,9 @@ def cata[F[_]: Functor, A, B](
 }
 ```
 
-While the name is intimidating, it's meaning is quite clear once you think about it. `cata` means _I know ancient greek_, `morphism` means _I know category theory_, which gives us `catamorphism` - _I know more than you do_.
+Хотя название пугает, его значение становится совершенно ясным, если подумать. `ката` означает _я знаю древнегреческий язык_, `морфизм` означает _я знаю теорию категорий_, что дает нам `катаморфизм` - _я знаю больше, чем вы_.
 
-And, of course, `op` has a proper, functional name. It's called, like just about everything else in functional programming, an _algebra_ (well, an F-Algebra, to be specific).
+И, конечно же, `op` имеет собственное функциональное имя. Она называется, как и все остальное в функциональном программировании, _алгеброй_ (ну, точнее, F-алгеброй).
 
 ```scala
 def cata[F[_]: Functor, A, B](
@@ -448,17 +448,17 @@ def cata[F[_]: Functor, A, B](
 }
 ```
 
-`F` also has a more official name: _pattern functor_, or _base functor_, depending on the papers you read.
+У `F` также есть более официальное название: _паттерн функтор_ или _базовый функтор_, в зависимости от статей, которые вы читаете.
 
-We've seen that the pattern functor could be thought of as a representation of intermediate steps in a structural recursion (or in any recursive algorithm, really): the decomposition of a problem, before and after solving its sub-problems.
+Мы видели, что паттерн функтор можно рассматривать как представление промежуточных шагов в структурной рекурсии (или в любом рекурсивном алгоритме, на самом деле): декомпозиции задачи до и после решения ее подзадач.
 
-Having named everything, we get this final representation of a catamorphism:
+Назвав всё, мы получаем окончательное представление о катаморфизме:
 
 ![Catamorphism](./img/cata-9.svg)
 
-## `product` as a cata
+## `product` как ката
 
-Before finishing our study of catamorphisms: we said that they were generalised structural recursion. If they're generalised, surely we should be able to write another structural recursion problem, `product`, as a catamorphism:
+Прежде чем закончить изучение катаморфизмов: мы сказали, что это обобщенная структурная рекурсия. Если они обобщены, мы наверняка сможем решить еще одну структурно-рекурсивную задачу: написать `product` в виде катаморфизма:
 
 ```scala
 val productAlgebra: ListF[Int] => Int = {
@@ -470,7 +470,7 @@ val product: List => Int =
   cata(productAlgebra, project)
 ```
 
-And, yes, this yields the expected result:
+И да, это дает ожидаемый результат:
 
 ```scala
 product(ints)
@@ -479,9 +479,9 @@ product(ints)
 
 ## Ключевые выводы
 
-We've seen that catamorphisms are far less complicated than their names make them out to be: a relatively straightforward refactoring away from familiar folds. And they would, in theory, allow us to write structural recursion algorithms on any type that can be projected into a pattern functor.
+Мы видели, что катаморфизмы намного менее сложны, чем их названия. И они теоретически позволили бы нам писать алгоритмы структурной рекурсии для любого типа, который может быть спроецирован в паттерн функтор.
 
-It's a bit of a shame that the only type we've seen that work on is `List`, then, isn't it?
+Немного обидно, что единственный тип, над которым мы работали, - это `List`, не так ли?
 
 [Назад](./fold.md) | [Оглавление](./README.md) | [Дальше](./tree_height.md)
 
