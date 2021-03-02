@@ -74,7 +74,7 @@ def unfold[A](
 
 ![Recurse](./img/ana-op-hl-1.svg)
 
-## Abstracting over structure
+## Абстрагирование структуры
 
 While we're trying to force `ListF` into `unfold`, let's take a look at the other side of the diagram:
 
@@ -160,7 +160,7 @@ This simplifies our diagram quite nicely:
 
 ![Recurse](./img/ana-functor-hl-1.svg)
 
-## Abstracting over `ListF`
+## Абстрагируясь от `ListF`
 
 We still have a few lose ends to tie up though. First, `ListF`:
 
@@ -185,7 +185,7 @@ And this gets rid of `ListF` completely.
 
 ![Recurse](./img/ana-listf-hl-1.svg)
 
-## Abstracting over `List`
+## Абстрагируясь от `List`
 
 Finally, our `unfold` is still hard-coded to `List` as its output type.
 

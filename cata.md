@@ -160,19 +160,19 @@ def fold[A](
 
 ## Промежуточное представление
 
-Давайте немного подумаем об этих необязательных `head` и` tail`. Я говорил `tail` в немного hand-wavy fashion, но это не совсем верно, не так ли?
+Давайте немного подумаем об этих необязательных `head` и` tail`. Я говорил `tail` не заостряя внимания на важных деталях, и сейчас самое время посмотреть на них внимательнее.
 
 ![Option of head, tail](./img/cata-4-hl-2.svg)
 
 С левой стороны у нас есть хвост списка. Но с правой стороны у нас есть `А`. Это больше не конец списка, так что же он представляет?
 
-It helps to think of `fold` as a mechanism for finding the solution to a problem, where the problem itself is the input `List`.
+Это помогает думать о `fold` как о механизме поиска решения задачи, где сама задача является входным `List`.
 
-`mkString`, for example, finds the solution to _what is the textual representation of this list?_. It goes from a `List`, the problem *before* it's been solved, to a `String`, the problem *after* it's been solved (also known as the solution).
+Например, `mkString` находит решение _какое текстовое представление у этого списка?_. Он идет от `List`, задача *до* решения, к `String`, задача *после* решения (также известная как решение).
 
-And if you think about it in that light, that optional `head` and `tail` is a very concrete representation of structural recursion. Take `Option[(Int, List)]`. This contains:
-- the smallest possible problem: `None`, the empty list.
-- a larger problem, `Some`, decomposed into a smaller problem, `tail`, and additional information, `head`.
+И если вы думаете об этом в таком свете, что опциональный `head` и `tail` - это очень конкретное представление структурной рекурсии. Возьмите `Option[(Int, List)]`. Он содержит:
+- наименьшую возможную задачу: `None`, пустой список
+- большая задача `Some`, разложенная на меньшую задачу, `tail`, и дополнительную информацию, `head`
 
 But `Option[(Int, A)]` is slightly different: in the `Some` case, the `tail` isn't the smaller problem anymore but its solution - the textual representation of your list, say. And this is extremely convenient! You're asked to solve your problem by being provided with:
 - the smallest possible problem: `None`, the empty list.
@@ -232,7 +232,7 @@ Which is a first step towards making our diagram slightly less noisy:
 
 ![ListF of tail](./img/cata-5-hl-1.svg)
 
-## Generalising recursion
+## Обобщающая рекурсию
 
 Now that we've done all that, I'd like you to take a look at the following part of the diagram:
 
@@ -294,7 +294,7 @@ This is a crucial step forward, because if we can express our requirements for `
 
 Oh, and yes, this is where the `F` in `ListF` comes from, because that notion of functor is a critical part of what makes `ListF` useful.
 
-## Functor
+## Функтор
 
 There are many ways we could encode functor - I toyed with using subtyping here, which would work perfectly, but decided that I didn't want to finish ruining whatever reputation I might have, so let's go with the traditional, boring approach: _type classes_.
 
@@ -364,7 +364,7 @@ In `List[A]`, `A` is the type of the values contained by the list. `List[Int]`, 
 In `ListF[A]`, `A` is the type of the value we use to represent the tail of a list. `ListF[List]` is a direct representation of a `List`: a head and a tail. `ListF[Int]` is the representation of a list after we've turned its tail into an int, for example by computing its product.
 
 
-## Abstracting over `ListF`
+## Абстрагируясь от `ListF`
 
 We're not quite done yet: `fold` still relies on `ListF`, which is strongly tied to the structure of a list.
 
@@ -389,7 +389,7 @@ This gives us `ListF`-free implementation:
 
 ![Generalised ListF](./img/cata-7-hl-1.svg)
 
-## Abstracting over `List`
+## Абстрагируясь от `List`
 
 Finally, the last step is abstracting over `List`, which is still the input type of our generic `fold`:
 
