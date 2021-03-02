@@ -212,7 +212,7 @@ And, finally, we don't have anything `List`-specific left in our `unfold`.
 
 ![Recurse](./img/ana-list-hl-1.svg)
 
-## Именование вещей
+## Именование
 
 Now that we have a completely generalised `unfold`, it's time to give it a proper name. This is known as an _anamorphism_, _ana_ for short:
 
