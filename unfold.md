@@ -4,11 +4,11 @@
 
 # Обобщённая генеративная рекурсия
 
-Now that we understand what generative recursion is, we're going to generalise an existing generative recursion function so that it can be used to express all others.
+Теперь, когда мы понимаем, что такое генеративная рекурсия, мы собираемся обобщить существующую функцию генеративной рекурсии, чтобы ее можно было использовать для выражения всех остальных.
 
-## Generalising `charCodes`
+## Обобщаем `charCodes`
 
-We're going to start from `charCodes`, whose code is:
+Начнем с `charCodes`, вот его код:
 
 ```scala
 def charCodes(
@@ -20,7 +20,7 @@ def charCodes(
 }
 ```
 
-As before, our first step is going to be to rename it. Let's call it `recurse` because why not.
+Как и раньше, нашим первым шагом будет его переименование. Назовем это `recurse`, потому что почему бы и нет.
 
 ```scala
 def recurse(
@@ -32,29 +32,29 @@ def recurse(
 }
 ```
 
-Here's a diagram that represents how `charCodes` behaves:
+Вот диаграмма, которая показывает, как ведет себя `charCodes`:
 
 ![Recurse](./img/unfold-init.svg)
 
-We first check whether the input string is empty. If it's not, we extract its head (as an int) and tail, then recurse on the later to get the tail of our new list.
+Сначала мы проверяем, пуста ли входная строка. Если это не так, мы извлекаем её голову (как int) и хвост, а затем рекурсивно выполняем последующие операции, чтобы получить хвост нашего нового списка.
 
-Finally, we create a new list from that optional head and tail.
+Наконец, мы создаем новый список из этой опциональной головы и хвоста.
 
 
-## Generalising the predicate
+## Обобщаем предикат
 
-Our first step is going to be to generalise that `nonEmpty` predicate:
+Нашим первым шагом будет обобщение предиката `nonEmpty`:
 
 ![Recurse](./img/unfold-predicate-before.svg)
 
-As we did before for `fold`, this is relatively straightforward. We'll start by creating a `predicate` function that does the same thing:
+Как и раньше для `fold`, это относительно просто. Мы начнем с создания функции `predicate`, которая делает то же самое:
 
 ```scala
 def predicate(from: String): Boolean =
   from.nonEmpty
 ```
 
-After which we can update `recurse` to take `predicate` as a parameter, and use that instead of the hard-coded `nonEmpty`.
+После чего мы можем обновить `recurse`, чтобы он принимал `predicate` в качестве параметра и использовать его вместо жестко запрограммированного `nonEmpty`.
 
 ```scala
 def recurse(
@@ -67,24 +67,24 @@ def recurse(
 }
 ```
 
-This is already a significant improvement: we have removed some hard-coded magic.
+Это уже значительное улучшение: мы удалили некоторую жестко закодированную магию.
 
 ![Recurse](./img/unfold-predicate-before-2.svg)
 
-## Generalising the update
+## Обобщаем update
 
-The next step is to take care of the hard-coded bit that turns a string into its head and tail.
+Следующий шаг - позаботиться о жестко запрограммированной магии, которая превращает строку в ее голову и хвост.
 
 ![Recurse](./img/unfold-update-before.svg)
 
-We can do so by extracting the logic into a function that takes a `String` and splits it into a tuple:
+Мы можем сделать это, выделив логику в функцию, которая принимает строку и разбивает ее на кортеж:
 
 ```scala
 def update(from: String): (Int, String) =
   (from.head.toInt, from.tail)
 ```
 
-This forces us to rewrite `recurse` a little bit to take `update` as a parameter, but the logic is still the same:
+Это вынуждает нас немного переписать `recurse`, чтобы использовать `update` в качестве параметра, но логика остается той же:
 
 ```scala
 def recurse(
@@ -100,17 +100,17 @@ def recurse(
 }
 ```
 
-And we've now gotten rid of all the hard-coded value-level bits:
+И теперь мы избавились от всей жестко закодированной магии уровня значений:
 
 ![Recurse](./img/unfold-update-before-2.svg)
 
-## Generalising the input type
+## Обобщаем входной тип
 
-We're still limited to taking strings as input, though.
+Однако мы по-прежнему принимаем на вход только строки.
 
 ![Recurse](./img/unfold-input-before.svg)
 
-Luckily, this can easily be worked around: we never actually use the fact that our state is a string. Our only requirement is that it's the same type that's manipulated by `predicate` and `update`, which we can express through a type parameter:
+К счастью, это легко обойти: мы никогда не используем тот факт, что наше состояние является строкой. Наше единственное требование - это тот же тип, которым манипулируют `predicate` и `update`, что мы можем выразить через параметр типа:
 
 ```scala
 def recurse[A](
@@ -126,13 +126,13 @@ def recurse[A](
 }
 ```
 
-We now have a new `recurse` function that abstracts over its input type, predicate and update functions.
+Теперь у нас есть новая функция `recurse`, которая абстрагируется от своего входного типа, функций предиката и обновления.
 
 ![Recurse](./img/unfold-input-before-2.svg)
 
-## Simplifying the step
+## Упрощаем шаг
 
-We're almost done, but for the same readability reasons as with `fold`, I want to turn the body of `recurse` into an internal helper function:
+Мы почти закончили, но по тем же причинам удобочитаемости, что и в случае с `fold`, я хочу превратить тело `recurse` во внутреннюю вспомогательную функцию:
 
 ```scala
 def recurse[A](
@@ -152,13 +152,13 @@ def recurse[A](
 }
 ```
 
-This yields the final diagram for our `recurse` function:
+Это дает окончательную диаграмму для нашей рекурсивной функции:
 
 ![Recurse](./img/unfold-loop.svg)
 
-## Dropping parameters
+## Отбрасываем параметры
 
-The observation we made while writing `fold` that it was just passing its parameters directly to `loop` still holds, so we'll do the same thing we did then: have `recurse` return `loop` directly.
+Наблюдение, сделанное нами при написании `fold` о том, что он просто передает свои параметры напрямую в `loop`, все еще сохраняется, поэтому мы сделаем то же самое, что и тогда: сделаем так, чтобы `recurse` возвращал `loop` напрямую.
 
 ```scala
 def recurse[A](
@@ -177,13 +177,13 @@ def recurse[A](
 }
 ```
 
-And this is a pretty decent implementation of generative recursion, stack safety issues aside.
+И это довольно приличная реализация генеративной рекурсии, если оставить проблемы безопасности стека за скобками.
 
 ## Именование
 
-Before we can move on, we must of course do the functional programmer thing and give it a proper name.
+Прежде чем мы сможем двигаться дальше, мы, конечно, должны заняться тем, что делают функциональные программисты и дать новому методу собственное имя.
 
-This is commonly known as `unfold`, which I find sort of poetic: where we used `fold` to sort of collapse a list onto itself and turn it into a single value, `unfold` does the opposite by unfolding a single value into a list.
+Это широко известно как `развёртка` (`unfold`), что я считаю довольно поэтичным: там, где мы использовали `свёртку` (`fold`), чтобы свернуть список и превратить его в одно значение, `развёртка` (`unfold`) делает противоположное, разворачивая одно значение в список.
 
 ```scala
 def unfold[A](
@@ -202,16 +202,16 @@ def unfold[A](
 }
 ```
 
-And our `unfold` still does exactly the same thing `charCodes` did:
+И наш `unfold` по-прежнему делает то же самое, что и `charCodes`:
 
 ```scala
 mkString(unfold(predicate, update)("cata"))
 // res31: String = 99 :: 97 :: 116 :: 97 :: nil
 ```
 
-## `range` as an unfold
+## `range` как `unfold`
 
-We know have an `unfold` implementation that should allow us to write recursive generation functions more comfortably. We know `charCodes` works - this is what we've been doing all along, but what about `range`?
+Мы знаем, что есть реализация `unfold`, которая должна позволить нам писать рекурсивные функции генерации более комфортно. Мы знаем, что для `charCodes` это работает, но как насчет `range`?
 
 ```scala
 val range: Int => List =
@@ -221,11 +221,11 @@ val range: Int => List =
   )
 ```
 
-We apply exactly the same logic as in our first implementation, but without having to do the boilerplate work:
-- predicate: is our state greater than 0?
-- update: use the state as the new `head`, and decrement the old state by 1 to get the new one.
+Мы применяем ту же логику, что и в нашей первой реализации, но без выполнения стандартной работы:
+- предикат: наше состояние больше 0?
+- функция обновления: использовать состояние в качестве новой `головы` и уменьшить старое состояние на 1, чтобы получить новое
 
-This, of course, behaves exactly as before:
+Это, конечно, ведет себя точно так же, как и раньше:
 
 ```scala
 mkString(range(3))
@@ -234,9 +234,9 @@ mkString(range(3))
 
 ## Ключевые выводы
 
-We've seen that generative recursion was straightforward to generalise: turn its predicate and update function into parameters.
+Мы видели, что генеративную рекурсию легко обобщить: превратить ее предикат и функцию обновления в параметры.
 
-This allows us to have a general generative recursion function, `unfold`. General, that is, provided you're working with `List` as output...
+Это позволяет нам иметь общую функцию генеративной рекурсии, `unfold`. Общую, то есть при условии, что вы работаете с `List` в качестве результата ...
 
 [Назад](./generative_recursion.md) | [Оглавление](./README.md) | [Дальше](./ana.md)
 
