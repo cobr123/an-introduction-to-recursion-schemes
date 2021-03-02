@@ -4,18 +4,18 @@
 
 # Генеративная рекурсия
 
-So far, we have taken a common recursive pattern, structural recursion, and generalised it into a recursion scheme known as a catamorphism. We achieved this through a little bit of creative refactoring and relying heavily on the notion of pattern functor.
+Мы рассмотрели простой рекурсивный паттерн, структурную рекурсию, и обобщили его в схему рекурсии, известную как катаморфизм. Мы достигли этого за счет небольшого творческого рефакторинга и в значительной степени полагаясь на понятие паттерна функтор.
 
-I would like to show you that this is basically all you need to know to come up with other recursion schemes.
+Я хотел бы показать, что это практически всё, что вам нужно знать, чтобы придумывать другие схемы рекурсии.
 
-We'll do so by studying another common recursive pattern, _generative recursion_, whose main purpose is to alleviate the hassle that creating values of recursive data types is.
+Для этого мы изучим другой популярный рекурсивный паттерн, _генеративную рекурсию_, основная цель которого - облегчить задачи, связанные с созданием значений рекурсивных типов данных.
 
-## Creating ranges
+## Создание диапазонов
 
 
-As an example, let's imagine a function that, given an upper bound, will generate a list ranging from that value to 1.
+В качестве примера представим функцию, которая сгенерирует список от заданного значения до 1.
 
-Such a function would commonly be implemented like this:
+Такая функция обычно реализуется следующим образом:
 
 ```scala
 def range(
@@ -26,29 +26,29 @@ def range(
 }
 ```
 
-The concept is relatively simple: while the input state is not 0, create a cons cell with that value as `head` and the range from the next smallest state as `tail`. Once it reaches 0, end the list.
+Идея относительно проста: пока входное состояние не равно 0, создайте cons-ячейку с этим значением в качестве `head` и диапазоном от следующего меньшего состояния в качестве `tail`. Как только оно достигнет 0, закончите список.
 
-This behaves exactly like you'd expect:
+Это дает в точности тот результат, как вы ожидаете:
 
 ```scala
 mkString(range(3))
 // res24: String = 3 :: 2 :: 1 :: nil
 ```
 
-If you look at it from a higher perspective though, you can see the shape of a more generic pattern:
-- given a state, evaluate it against a predicate
-- if that predicate holds:
-  - transform the state into a next state and a value.
-  - create a new list with that value for `head` and the solution of the problem for the next state for `tail`.
-- if the predicate doesn't hold, close the list.
+Если вы посмотрите на это с более высокой точки зрения, вы можете увидеть форму более общего паттерна:
+- учитывая состояние, оценить его по предикату
+- если этот предикат верен:
+  - преобразовать состояние в следующее состояние и значение
+  - создать новый список с этим значением в качестве `head` и решением задачи для следующего состояния в качестве `tail`
+- если предикат не выполняется, закрыть список
 
-You can apply this pattern to solve all sorts of similar problems.
+Вы можете применить этот паттерн для решения всевозможных подобных задач.
 
-## Extracting character codes
+## Извлечение кодов символов
 
-Let's say, for example, that you need to turn a string into a list of its characters, represented as their numerical value - you might be trying to hash it, say, or write it to a raw byte stream.
+Например, вам нужно превратить строку в список ее символов, представленных как их числовое значение - например, вы пытаетесь хешировать его или записать в необработанный поток байтов.
 
-Here's a possible implementation:
+Вот возможная реализация:
 
 ```scala
 def charCodes(
@@ -60,13 +60,13 @@ def charCodes(
 }
 ```
 
-This uses the exact same pattern:
-- predicate: is the list empty?
-- update function:
-  - new head: first character of the string as an `Int`.
-  - next state: whatever is left of the string.
+Здесь используется точно такой же шаблон:
+- предикат: список пуст?
+- функция обновления:
+  - новый `head`: первый символ строки как `Int`
+  - следующее состояние: все, что осталось от строки
 
-And this yields the expected result:
+И это дает ожидаемый результат:
 
 ```scala
 mkString(charCodes("cata"))
@@ -75,15 +75,15 @@ mkString(charCodes("cata"))
 
 ## Ключевые выводы
 
-Generative recursion is a recursive pattern used to create values of recursive data types.
+Генеративная рекурсия - это рекурсивный паттерн, используемый для создания значений рекурсивных типов данных.
 
-It's composed of two main parts:
-- a predicate that tells us whether to keep building the list or not.
-- an update function that yields:
-  - the head of the list.
-  - the updated state from which to keep recursing.
+Он состоит из двух основных частей:
+- предикат, который сообщает нам, продолжать ли строить список или нет
+- функция обновления, которая дает:
+  - начало списка
+  - обновленное состояние, из которого нужно продолжать рекурсию
 
-Knowing these common parts, it'd be nice to generalise generative recursion to parameterize them.
+Зная эти общие части, было бы неплохо обобщить генеративную рекурсию, чтобы параметризовать их.
 
 [Назад](./fix.md) | [Оглавление](./README.md) | [Дальше](./unfold.md)
 
