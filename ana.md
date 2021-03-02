@@ -4,13 +4,13 @@
 
 # Обобщённая развёртка
 
-We have implemented a generalised generative recursion function for lists, `unfold`. Our task it to now turn it into a proper recursion scheme: generative recursion that works for *any* recursive data type.
+Мы реализовали обобщенную функцию генеративной рекурсии для списков, `unfold`. Наша задача теперь превратить её в правильную схему рекурсии: генеративную рекурсию, которая работает для *любого* рекурсивного типа данных.
 
-## Generalised unfolds
+## Обобщенный `unfold`
 
-We'll take the same approach as before: go from the `List`-specific `unfold`, and refactor it until it's not `List`-specific anymore.
+Мы воспользуемся тем же подходом, что и раньше: начнём с `unfold` специфичного для `List` и будем рефакторить до тех пор, пока он не перестанет быть специфичным для `List`.
 
-Here's our `unfold` implementation:
+Вот наша реализация `unfold`:
 
 ```scala
 def unfold[A](
@@ -29,21 +29,21 @@ def unfold[A](
 }
 ```
 
-We'll be using a shortcut, though: now that we know about pattern functors and their ability to represent intermediate steps in a recursive algorithm, we'll try and use them as soon as possible.
+Однако мы будем использовать кратчайший путь: теперь, когда мы знаем о паттерне функтор и его способности представлять промежуточные шаги в рекурсивном алгоритме, мы постараемся использовать его как можно скорее.
 
-## Simplifying `predicate` and `update`
+## Упрощаем `predicate` и `update`
 
-The first place where we can see the shape of `ListF`, the pattern functor for list, is in `predicate` and `update`:
+Первое место, где мы можем увидеть форму `ListF`, паттерна функтор для списка, находится в` predicate` и `update`:
 
 ![Recurse](./img/ana-op-before.svg)
 
-If you squint, they're really a single function from state to optional head and next state:
+Если прищуриться, на самом деле это одна функция от состояния до опциональной головы и следующего состояния:
 
 ![Recurse](./img/ana-op-before-hl-1.svg)
 
-Let's call this single function `op` because I'm not above a little foreshadowing.
+Назовем эту единственную функцию `op`.
 
-`op` evaluates our predicate (_is the string empty?_) and, if true, wraps the result of `update` in `Some`. If `false`, it'll return a `None`.
+`op` вычисляет наш предикат (_пустая ли строка?_) и, если он истинен, помещает результат `update` в `Some`. Если нет, он вернет `None`.
 
 ```scala
 val op: String => ListF[String] =
@@ -53,7 +53,7 @@ val op: String => ListF[String] =
   }
 ```
 
-This allows us to simplify `loop` into a pattern match:
+Это позволяет нам упростить `loop` до сопоставления с образцом:
 
 ```scala
 def unfold[A](
@@ -70,19 +70,19 @@ def unfold[A](
 }
 ```
 
-`unfold` now looks like this suddenly much more familiar diagram:
+`unfold` теперь внезапно выглядит как более знакомая диаграмма:
 
 ![Recurse](./img/ana-op-hl-1.svg)
 
 ## Абстрагирование структуры
 
-While we're trying to force `ListF` into `unfold`, let's take a look at the other side of the diagram:
+Пока мы пытаемся форсировать `ListF` в `unfold`, давайте взглянем на другую сторону диаграммы:
 
 ![Recurse](./img/ana-embed-before.svg)
 
-That's really a function that, given an optional head and tail (a `ListF`), turns it into a list.
+Это в действительности функция, которая при наличии необязательных головы и хвоста (`ListF`) превращает их в список.
 
-That function is commonly known as `embed` and has a straightforward implementation:
+Эта функция широко известна как `embed` и имеет простую реализацию:
 
 ```scala
 val embed: ListF[List] => List = {
@@ -91,9 +91,9 @@ val embed: ListF[List] => List = {
 }
 ```
 
-If we have a head and tail, we'll turn them into a list. Otherwise, we have the empty list.
+Если у нас есть голова и хвост, мы превратим их в список. В противном случае у нас пустой список.
 
-We can update `unfold` to take `embed` as a parameter, which allows us to get rid of explicit references to `Cons` and `Nil`:
+Мы можем обновить функцию `unfold` так, чтобы она принимала `embed` в качестве параметра, что позволяет нам избавиться от явных ссылок на `Cons` и `Nil`:
 
 ```scala
 def unfold[A](
@@ -111,7 +111,7 @@ def unfold[A](
 }
 ```
 
-As before with `cata`, note that `embed` is called on the result of both branches of the pattern match, which allows us to move it outside:
+Как и раньше с `cata`, обратите внимание, что `embed` вызывается в результате обеих ветвей сопоставления с образцом, что позволяет нам переместить его наружу:
 
 ```scala
 def unfold[A](
@@ -129,19 +129,19 @@ def unfold[A](
 }
 ```
 
-This results in a slightly more complex but, again, suspiciously familiar diagram:
+В результате получается немного более сложная, но опять же подозрительно знакомая диаграмма:
 
 ![Recurse](./img/ana-embed-hl-1.svg)
 
-## Using Functor
+## Используем функтор
 
-Now that we've shoehorned a pattern functor in `unfold`, everything sort of falls together. Take a look at the central part of our diagram.
+Теперь, когда мы втиснули паттерн функтор в `unfold`, всё как бы становится похоже. Взгляните на центральную часть нашей диаграммы.
 
 ![Recurse](./img/ana-functor-before.svg)
 
-We're turning a `ListF[A]` into a `ListF[List]` by applying an `A => List` function to the `A`. This is functors all over again!
+Мы превращаем `ListF[A]` в `ListF[List]` применяя функцию `A => List` к `A`. Это снова функторы!
 
-We can take out that entire pattern match and replace it with `map`, because they're exactly the same thing:
+Мы можем заменить сопоставление с образцом на `map`, потому что это одно и то же:
 
 ```scala
 def unfold[A](
@@ -156,17 +156,17 @@ def unfold[A](
 }
 ```
 
-This simplifies our diagram quite nicely:
+Это очень хорошо упрощает нашу диаграмму:
 
 ![Recurse](./img/ana-functor-hl-1.svg)
 
 ## Абстрагируемся от `ListF`
 
-We still have a few lose ends to tie up though. First, `ListF`:
+Нам еще предстоит решить несколько вопросов. Во-первых, `ListF`:
 
 ![Recurse](./img/ana-listf-before.svg)
 
-This is very `List` specific, and we want it out. Luckily for us, the only thing we actually need to know about `ListF` is that we can call `map` on it - that it has a functor instance. We can replace it with a type parameter with the same constraints:
+Это очень специфично для `List`, и мы хотим от этого избавиться. К счастью, единственное, что нам действительно нужно знать о `ListF`, - это то, что мы можем вызывать для него `map` - что у него есть экземпляр функтора. Мы можем заменить его параметром типа с теми же ограничениями:
 
 ```scala
 def unfold[F[_]: Functor, A](
@@ -181,19 +181,19 @@ def unfold[F[_]: Functor, A](
 }
 ```
 
-And this gets rid of `ListF` completely.
+И это полностью избавляет от `ListF`.
 
 ![Recurse](./img/ana-listf-hl-1.svg)
 
 ## Абстрагируемся от `List`
 
-Finally, our `unfold` is still hard-coded to `List` as its output type.
+Наконец, наш `unfold` по-прежнему жестко запрограммирован на `List` в качестве выходного типа.
 
 ![Recurse](./img/ana-list-before.svg)
 
-It really doesn't need to be though, since we never use the fact that we're working with a list - just a type that `op` and `embed` know how to work with.
+На самом деле это не обязательно, поскольку мы никогда не используем тот факт, что мы работаем со списком - просто тип, с которым `op` и` embed` знают, как работать.
 
-This allows us to turn it into a type parameter:
+Это позволяет нам превратить его в параметр типа:
 
 ```scala
 def unfold[F[_]: Functor, A, B](
@@ -208,13 +208,13 @@ def unfold[F[_]: Functor, A, B](
 }
 ```
 
-And, finally, we don't have anything `List`-specific left in our `unfold`.
+И, наконец, у нас не осталось ничего специфичного для `List` в нашем `unfold`.
 
 ![Recurse](./img/ana-list-hl-1.svg)
 
 ## Именование
 
-Now that we have a completely generalised `unfold`, it's time to give it a proper name. This is known as an _anamorphism_, _ana_ for short:
+Теперь, когда у нас есть полностью обобщенный `unfold`, пора дать ему собственное имя. Это называется _анаморфизмом_, сокращенно _ана_:
 
 ```scala
 def ana[F[_]: Functor, A, B](
@@ -229,13 +229,13 @@ def ana[F[_]: Functor, A, B](
 }
 ```
 
-That names follows exactly the same logic as _catamorphism_: its entire point is to make sure you know that whoever uses it is smarter than you are.
+Эти имена следуют той же логике, что и _катаморфизм_: вся его цель - убедиться, что вы знаете, что тот, кто использует его, умнее вас.
 
-And, of course, `op` is not the right name for that `A => F[A]`.
+И, конечно, `op` не подходящее название для `A => F[A]`.
 
-If you remember, with `cata`, we had an `F[A] => A`, which we called an algebra. It has a very similar type to `op` - it is, in fact, the same thing with the "arrow flipped". Flipping arrows is a very popular activity among people who understand category theory, and whenever they manage it they say the thing with the flipped arrow is the dual of the original thing, and is a _co-_ original thing.
+Если вы помните, с `cata` у нас была функция `F[A] => A`, которую мы назвали алгеброй. Её тип очень похож на тип `op` - фактически, это то же самое, что и "перевернутая стрелка". Переворачивание стрелок - очень популярное занятие среди людей, разбирающихся в теории категорий, и всякий раз, когда им это удается, они говорят, что объект с перевернутой стрелкой является двойственным оригиналу и является _ко-_ оригинальной вещью.
 
-It should come as no surprise, then, that `op` is really known as a co-algebra.
+Поэтому неудивительно, что `op` известен как коалгебра.
 
 ```scala
 def ana[F[_]: Functor, A, B](
@@ -250,21 +250,21 @@ def ana[F[_]: Functor, A, B](
 }
 ```
 
-`ana` works exactly as before for `charCodes`:
+`ana` работает точно так же, как и раньше для `charCodes`:
 
 ```scala
 mkString(ana(op, embed).apply("cata"))
 ```
 
-And now that we've named everything properly, we get the complete diagram for `ana`:
+И теперь, когда мы все правильно назвали, мы получаем полную диаграмму для `ana`:
 
 ![Recurse](./img/ana-coalgebra.svg)
 
-## `range` as an ana
+## `range` как `ana`
 
-We know that `charCodes` can be implemented as a specific version of `ana` - this is what we've been doing all along.
+Мы знаем, что `charCodes` можно реализовать как конкретную версию `ana` - это то, чем мы занимались до этого.
 
-Here's how you'd do `range` as an anamorphism:
+Вот как можно реализовать `range` в виде анаморфизма:
 
 ```scala
 val rangeCoAlgebra: Int => ListF[Int] = i => {
@@ -276,7 +276,7 @@ val range: Int => List =
   ana(rangeCoAlgebra, embed)
 ```
 
-And you'd get the exact same result as with the initial implementation:
+И вы получите тот же результат, что и при первоначальной реализации:
 
 ```scala
 mkString(range(3))
@@ -285,9 +285,9 @@ mkString(range(3))
 
 ## Ключевые выводы
 
-We've seen that anamorphisms were generalised unfolds for types that could be embedded from a pattern functor, and that inventing them was mostly a matter of forcing a pattern functor in a non-general `unfold`.
+Мы увидели, что анаморфизмы были обобщенными развёртками (`unfold`) для типов, которые могли быть встроены (`embed`) в паттерн функтор, и что их изобретение было в основном вопросом использования паттерна функтор в необобщенном `unfold`.
 
-Something that's a bit surprising is how similar to catamorphisms they end up looking, though. There's clearly some interesting thread to pull there.
+Что немного удивительно, так это то, насколько они похожи на катаморфизмы. Это интересная зацепка.
 
 [Назад](./unfold.md) | [Оглавление](./README.md) | [Дальше](./hylo.md)
 
