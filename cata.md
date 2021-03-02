@@ -170,25 +170,25 @@ def fold[A](
 
 Например, `mkString` находит решение _какое текстовое представление у этого списка?_. Он идет от `List`, задача *до* решения, к `String`, задача *после* решения (также известная как решение).
 
-И если вы думаете об этом в таком свете, что опциональный `head` и `tail` - это очень конкретное представление структурной рекурсии. Возьмите `Option[(Int, List)]`. Он содержит:
+И если вы думаете об этом в таком свете, то опциональный `head` и `tail` это очень конкретное представление структурной рекурсии. Возьмите `Option[(Int, List)]`. Он содержит:
 - наименьшую возможную задачу: `None`, пустой список
-- большая задача `Some`, разложенная на меньшую задачу, `tail`, и дополнительную информацию, `head`
+- бóльшую задачу `Some`, разложенную на меньшую задачу, `tail`, и дополнительную информацию, `head`
 
-But `Option[(Int, A)]` is slightly different: in the `Some` case, the `tail` isn't the smaller problem anymore but its solution - the textual representation of your list, say. And this is extremely convenient! You're asked to solve your problem by being provided with:
-- the smallest possible problem: `None`, the empty list.
-- a larger problem, decomposed into *the solution to a smaller problem* and additional information, `head`.
+Но `Option[(Int, A)]` немного другой: в случае `Some`, `tail` больше не меньшая задача, а её решение - текстовое представление списка. И это очень удобно! Вас просят решить задачу, предоставив:
+- наименьшую возможную задачу: `None`, пустой список
+- бóльшую задачу, разложенную на *решение меньшей задачи* и дополнительную информацию, `head`
 
-This optional `head` and `tail` is an extremely interesting type, because it allows us to represent intermediate steps of our `fold`. So interesting, in fact, that we'll give it a name: `ListF`.
+Этот опциональный `head` и `tail` является чрезвычайно интересным типом, поскольку он позволяет нам представлять промежуточные этапы нашей свёртки (`fold`). Настолько интересный, что мы дадим ему имя: `ListF`.
 
 ```scala
 type ListF[A] = Option[(Int, A)]
 ```
 
-There's a concrete reason for that unpleasant name. The `List` part is obvious: `ListF` has something to do with lists, so let's stick that in there. I will however not explain the `F` yet to avoid spoiling an intuition I'm hoping to build up to.
+У этого неприятного названия есть конкретная причина. Часть `List` очевидна: `ListF` имеет какое-то отношение к спискам, так что давайте оставим это там. Однако я пока не буду объяснять букву `F`, чтобы не испортить интуицию, которую я надеюсь развить.
 
-We use `ListF` to represent different steps of our `fold`.
+Мы используем `ListF` для представления различных шагов нашей свёртки (`fold`).
 
-First, the decomposition of a problem into the basic components of structural recursion, which we get through `project`:
+Во-первых, декомпозируем задачу на основные компоненты структурной рекурсии, которую мы получаем через `project`:
 
 ```scala
 val project: List => ListF[List] = {
@@ -197,9 +197,9 @@ val project: List => ListF[List] = {
 }
 ```
 
-`ListF`'s type parameter is `List`: the type of the problem before it's been solved.
+`List`, параметр типа для `ListF`: тип задачи до ее решения.
 
-But then, `ListF` also represents the decomposition of a problem into additional information and *the solution* of a smaller problem. And we can go from that to a solution of the complete problem through `op`:
+Но тогда, `ListF` также представляет собой декомпозицию задачи на дополнительную информацию и *решение* меньшей задачи. И мы можем перейти от этого к решению всей задачи с помощью `op`:
 
 ```scala
 val op: ListF[String] => String = {
@@ -208,9 +208,9 @@ val op: ListF[String] => String = {
 }
 ```
 
-`ListF`'s type parameter is `String`: the type of the problem after it's been solved.
+`String`, параметр типа для `ListF`: тип задачи после ее решения.
 
-Now that we have that versatile `ListF` type, we should update `fold` to use that instead of option of `head` and `tail`:
+Теперь, когда у нас есть универсальный тип `ListF`, мы должны обновить `fold`, чтобы использовать его вместо опционального `head` и `tail`:
 
 ```scala
 def fold[A](
@@ -228,11 +228,11 @@ def fold[A](
 }
 ```
 
-Which is a first step towards making our diagram slightly less noisy:
+Это первый шаг к тому, чтобы сделать нашу диаграмму немного менее зашумленной:
 
 ![ListF of tail](./img/cata-5-hl-1.svg)
 
-## Обобщающая рекурсию
+## Обобщаем рекурсию
 
 Now that we've done all that, I'd like you to take a look at the following part of the diagram:
 
