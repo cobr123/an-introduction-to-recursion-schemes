@@ -234,13 +234,13 @@ def fold[A](
 
 ## Обобщаем рекурсию
 
-Now that we've done all that, I'd like you to take a look at the following part of the diagram:
+Теперь, когда мы сделали все это, я хотел бы, чтобы вы взглянули на следующую часть диаграммы:
 
 ![Does this look familiar?](./img/cata-5-hl-2.svg)
 
-Does it look in any way familiar? You go from a `ListF[List]` to a `ListF[A]` by applying a mess of code that essentially boils down to `loop` - a function from `List` to `A`.
+Вам это не кажется знакомым? Вы переходите от `ListF[List]` к `ListF[A]`, применяя массу кода, который по сути сводится к `loop` - функции из `List` в `A`.
 
-Let's see if we can make the intuition more obvious by taking the pattern match out of `loop` and into a helper function that we'll call `go` because I'm running out of names:
+Давайте посмотрим, сможем ли мы сделать интуицию более очевидной, взяв сопоставление с шаблоном из `loop` во вспомогательную функцию, которую мы назовем `go`, потому что у меня заканчиваются имена:
 
 ```scala
 def fold[A](
@@ -261,9 +261,9 @@ def fold[A](
 }
 ```
 
-`go` is a function that goes from a `ListF[List]` to a `ListF[A]` by basically applying `loop`, a function from `List` to `A`.
+`go` это функция преобразующая `ListF[List]` в `ListF[A]` основном применяя `loop`, функцию преобразующую `List` в `A`.
 
-But let's make it even more obvious by taking `loop` out of the equation and making it a parameter to `go`:
+Но давайте сделаем это еще более очевидным, исключив `loop` из уравнения и сделав его параметром для `go`:
 
 ```scala
 def fold[A](
@@ -284,15 +284,15 @@ def fold[A](
 }
 ```
 
-`go` takes a `ListF[List]`, a function from `List` to `A` and returns a `ListF[A]`.
+`go` берёт `ListF[List]`, функцию преобразующую `List` в `A` и возвращает `ListF[A]`.
 
-And that's `map`! It's a function that you'll find all over the place. Given an `Option[A]` and an `A => B`, `map` gives you an `Option[B]`. Given a `Future[A]` and an `A => B`, `map` gives you a `Future[B]`. It works with `List`, `Try`... just about everything.
+И это `map`! Это функция, которую вы найдете повсюду. Для `Option[A]` и функции `A => B`, `map` вернёт вам `Option[B]`. Для `Future[A]` и функции `A => B`, `map` вернёт вам `Future[B]`. Это работает для `List`, `Try`... практически для всего.
 
-It's such a recurring pattern that it's commonly abstracted behind something called a functor, which is not the friendliest name but really just means _something that has a sane `map` implementation_.
+Это настолько повторяющийся паттерн, что он обычно абстрагируется за чем-то, что называется функтором, что не является самым дружелюбным названием, но на самом деле просто означает _что-то, что имеет разумную реализацию `map`_.
 
-This is a crucial step forward, because if we can express our requirements for `ListF` in terms of functor, maybe we can finally abstract away the structure of `List`!
+Это важный шаг вперед, потому что, если мы сможем выразить наши требования к `ListF` в терминах функтора, возможно, мы наконец сможем абстрагироваться от структуры `List`!
 
-Oh, and yes, this is where the `F` in `ListF` comes from, because that notion of functor is a critical part of what makes `ListF` useful.
+О, и да, именно отсюда `F` в `ListF`, потому что понятие функтора является важной частью того, что делает `ListF` полезным.
 
 ## Функтор
 
